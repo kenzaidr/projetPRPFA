@@ -1,0 +1,265 @@
+/* Moroccan Pattern Background */
+.moroccan-pattern {
+    background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(193, 39, 45, 0.1) 35px, rgba(193, 39, 45, 0.1) 70px),
+        repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(0, 98, 51, 0.1) 35px, rgba(0, 98, 51, 0.1) 70px);
+    width: 100%;
+    height: 100%;
+}
+
+.moroccan-pattern-white {
+    background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255, 255, 255, 0.1) 35px, rgba(255, 255, 255, 0.1) 70px),
+        repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255, 255, 255, 0.1) 35px, rgba(255, 255, 255, 0.1) 70px);
+    width: 100%;
+    height: 100%;
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes float-delayed {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+    animation: float-delayed 3s ease-in-out infinite;
+    animation-delay: 1s;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #C1272D, #006233);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #a01f25, #004d28);
+}
+
+/* Gradient Text Animation */
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+}
+
+/* Card Hover Effects */
+.hover-lift {
+    transition: all 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+    
+    h2 {
+        font-size: 2rem;
+    }
+}
+
+/* RTL Support Enhancements */
+[dir="rtl"] {
+    text-align: right;
+}
+
+[dir="rtl"] .flex {
+    flex-direction: row-reverse;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Button Ripple Effect */
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ripple::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-ripple:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Glassmorphism Effect */
+.glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Language Switcher Styles */
+.language-switcher {
+    position: relative;
+}
+
+.language-switcher button[data-lang] {
+    transition: all 0.2s ease;
+}
+
+.language-switcher button[data-lang]:hover {
+    background-color: rgba(193, 39, 45, 0.05);
+}
+
+.language-switcher button[data-lang].active-lang,
+.language-switcher button[data-lang].bg-morocco-red\/10 {
+    background-color: rgba(193, 39, 45, 0.1);
+    color: #C1272D;
+    font-weight: 600;
+}
+
+#languageDropdown {
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* RTL/LTR Support */
+body.ltr [dir="rtl"],
+[dir="ltr"] {
+    direction: ltr !important;
+}
+
+body.rtl [dir="ltr"],
+[dir="rtl"] {
+    direction: rtl !important;
+}
+
+[dir="ltr"] .text-right,
+body.ltr .text-right {
+    text-align: left !important;
+}
+
+[dir="ltr"] .justify-end,
+body.ltr .justify-end {
+    justify-content: flex-start !important;
+}
+
+[dir="ltr"] .mr-auto,
+body.ltr .mr-auto {
+    margin-right: 0 !important;
+    margin-left: auto !important;
+}
+
+[dir="rtl"] .text-left,
+body.rtl .text-left {
+    text-align: right !important;
+}
+
+[dir="rtl"] .justify-start,
+body.rtl .justify-start {
+    justify-content: flex-end !important;
+}
+
+/* Flex direction for RTL */
+[dir="ltr"] .flex,
+body.ltr .flex {
+    flex-direction: row;
+}
+
+[dir="rtl"] .flex,
+body.rtl .flex {
+    flex-direction: row-reverse;
+}
+
+/* Override flex direction for specific cases */
+[dir="ltr"] .flex-col,
+body.ltr .flex-col,
+[dir="rtl"] .flex-col,
+body.rtl .flex-col {
+    flex-direction: column !important;
+}
+
+/* Moroccan Tile Pattern for Decorative Elements */
+.tile-pattern {
+    background-image: 
+        linear-gradient(30deg, #C1272D 12%, transparent 12.5%, transparent 87%, #C1272D 87.5%, #C1272D),
+        linear-gradient(150deg, #C1272D 12%, transparent 12.5%, transparent 87%, #C1272D 87.5%, #C1272D),
+        linear-gradient(30deg, #C1272D 12%, transparent 12.5%, transparent 87%, #C1272D 87.5%, #C1272D),
+        linear-gradient(150deg, #C1272D 12%, transparent 12.5%, transparent 87%, #C1272D 87.5%, #C1272D),
+        linear-gradient(60deg, #006233 25%, transparent 25.5%, transparent 75%, #006233 75%, #006233),
+        linear-gradient(60deg, #006233 25%, transparent 25.5%, transparent 75%, #006233 75%, #006233);
+    background-size: 80px 140px;
+    background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+    opacity: 0.1;
+}
