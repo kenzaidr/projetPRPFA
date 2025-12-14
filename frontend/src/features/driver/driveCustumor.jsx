@@ -26,7 +26,26 @@ const translations = {
     'rideType.comfort': 'راحة',
     'rideType.xl': 'كبير',
     'rideType.price.from': 'من',
-    'btn.book': 'احجز الآن',
+    'btn.book': 'Voir les prix',
+    'btn.viewPrices': 'Voir les prix',
+    'schedule.button': 'جدولة لاحقاً',
+    'schedule.modal.title': 'اختر نوع الاستلام',
+    'schedule.immediate': 'استلام فوري',
+    'schedule.later': 'جدولة لاحقاً',
+    'schedule.date': 'التاريخ',
+    'schedule.time': 'الوقت',
+    'schedule.cancel': 'إلغاء',
+    'schedule.confirm': 'تأكيد',
+    'location.allow': 'السماح بالوصول إلى الموقع',
+    'location.allow.desc': 'يوفر عنوان الاستلام الخاص بك',
+    'schedule.button': 'Planifier plus tard',
+    'schedule.modal.title': 'Choisir le type de prise en charge',
+    'schedule.immediate': 'Prise en charge immédiate',
+    'schedule.later': 'Planifier plus tard',
+    'schedule.date': 'Date',
+    'schedule.time': 'Heure',
+    'schedule.cancel': 'Annuler',
+    'schedule.confirm': 'Confirmer',
     // Features
     'features.title': 'لماذا Grab Morocco؟',
     'features.safety.title': 'أمان مضمون',
@@ -104,7 +123,18 @@ const translations = {
     'rideType.comfort': 'Confort',
     'rideType.xl': 'XL',
     'rideType.price.from': 'À partir de',
-    'btn.book': 'Réserver maintenant',
+    'btn.book': 'Voir les prix',
+    'btn.viewPrices': 'Voir les prix',
+    'schedule.button': 'Planifier plus tard',
+    'location.allow': 'Autoriser l\'accès à la localisation',
+    'location.allow.desc': 'Il fournit votre adresse de prise en charge',
+    'schedule.modal.title': 'Choisir le type de prise en charge',
+    'schedule.immediate': 'Prise en charge immédiate',
+    'schedule.later': 'Planifier plus tard',
+    'schedule.date': 'Date',
+    'schedule.time': 'Heure',
+    'schedule.cancel': 'Annuler',
+    'schedule.confirm': 'Confirmer',
     // Features
     'features.title': 'Pourquoi choisir Grab Morocco ?',
     'features.safety.title': 'Sécurité garantie',
@@ -182,7 +212,18 @@ const translations = {
     'rideType.comfort': 'Comfort',
     'rideType.xl': 'XL',
     'rideType.price.from': 'From',
-    'btn.book': 'Book now',
+    'btn.book': 'See prices',
+    'btn.viewPrices': 'See prices',
+    'schedule.button': 'Schedule later',
+    'schedule.modal.title': 'Choose pickup type',
+    'schedule.immediate': 'Immediate pickup',
+    'schedule.later': 'Schedule later',
+    'schedule.date': 'Date',
+    'schedule.time': 'Time',
+    'schedule.cancel': 'Cancel',
+    'schedule.confirm': 'Confirm',
+    'location.allow': 'Allow location access',
+    'location.allow.desc': 'It provides your pickup address',
     // Features
     'features.title': 'Why choose Grab Morocco?',
     'features.safety.title': 'Guaranteed safety',
@@ -248,6 +289,15 @@ const Ride = () => {
     return localStorage.getItem('language') || 'fr';
   });
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [scheduleType, setScheduleType] = useState('immediate'); // 'immediate' or 'later'
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [scheduledTime, setScheduledTime] = useState('');
+  const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
+  const [locationSuggestions, setLocationSuggestions] = useState([
+    { address: 'Calle Pedro Barba 4', city: '35500 Arrecife, ES' },
+    { address: 'Calle Pedro Barba 6', city: '35500 Arrecife, ES' },
+  ]);
 
   // Fonction de traduction
   const t = (key) => {
@@ -257,7 +307,46 @@ const Ride = () => {
   const handleBookRide = (e) => {
     e.preventDefault();
     // Logique de réservation à implémenter
-    console.log('Réservation:', { pickup, destination, rideType });
+    console.log('Réservation:', { 
+      pickup, 
+      destination, 
+      scheduleType,
+      scheduledDate: scheduleType === 'later' ? scheduledDate : null,
+      scheduledTime: scheduleType === 'later' ? scheduledTime : null
+    });
+  };
+
+  const handleScheduleConfirm = () => {
+    setShowScheduleModal(false);
+  };
+
+  const handleScheduleCancel = () => {
+    setShowScheduleModal(false);
+  };
+
+  const handleUseCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          // Ici, vous pouvez utiliser une API de géocodage inverse pour obtenir l'adresse
+          // Pour l'instant, on utilise juste les coordonnées
+          setPickup(`${latitude}, ${longitude}`);
+          setShowPickupSuggestions(false);
+        },
+        (error) => {
+          console.error('Erreur de géolocalisation:', error);
+          alert('Impossible d\'accéder à votre localisation');
+        }
+      );
+    } else {
+      alert('La géolocalisation n\'est pas supportée par votre navigateur');
+    }
+  };
+
+  const handleSelectSuggestion = (address) => {
+    setPickup(address);
+    setShowPickupSuggestions(false);
   };
 
   const handleLanguageChange = (lang) => {
@@ -290,6 +379,28 @@ const Ride = () => {
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [showLanguageDropdown]);
+
+  // Fermer le modal avec la touche Escape
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape' && showScheduleModal) {
+        setShowScheduleModal(false);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showScheduleModal]);
+
+  // Fermer les suggestions quand on clique en dehors
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showPickupSuggestions && !event.target.closest('.pickup-group')) {
+        setShowPickupSuggestions(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showPickupSuggestions]);
 
   return (
     <div className="ride-landing">
@@ -382,6 +493,21 @@ const Ride = () => {
             </div>
 
             <form onSubmit={handleBookRide} className="booking-form">
+              {/* Schedule Button */}
+              <button
+                type="button"
+                className="schedule-button"
+                onClick={() => setShowScheduleModal(true)}
+              >
+                <svg className="schedule-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {scheduleType === 'immediate' ? t('schedule.immediate') : t('schedule.button')}
+                <svg className="schedule-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
               <div className="form-group">
                 <label className="form-label">
                   <svg className="form-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -400,60 +526,70 @@ const Ride = () => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="form-group pickup-group">
                 <label className="form-label">
                   <svg className="form-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   {t('form.pickup')}
                 </label>
-                <input
-                  type="text"
-                  placeholder={t('form.pickup.placeholder')}
-                  value={pickup}
-                  onChange={(e) => setPickup(e.target.value)}
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">{t('form.rideType')}</label>
-                <div className="ride-types">
+                <div className="pickup-input-wrapper">
+                  <input
+                    type="text"
+                    placeholder={t('form.pickup.placeholder')}
+                    value={pickup}
+                    onChange={(e) => setPickup(e.target.value)}
+                    onFocus={() => setShowPickupSuggestions(true)}
+                    className="form-input pickup-input"
+                    required
+                  />
                   <button
                     type="button"
-                    className={`ride-type ${rideType === 'standard' ? 'active' : ''}`}
-                    onClick={() => setRideType('standard')}
+                    className="pickup-locate-btn"
+                    onClick={() => setShowPickupSuggestions(!showPickupSuggestions)}
+                    aria-label="Locate"
                   >
-                    <div className="ride-type-icon">🚗</div>
-                    <div className="ride-type-info">
-                      <div className="ride-type-name">{t('rideType.standard')}</div>
-                      <div className="ride-type-price">{t('rideType.price.from')} 25 MAD</div>
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    className={`ride-type ${rideType === 'comfort' ? 'active' : ''}`}
-                    onClick={() => setRideType('comfort')}
-                  >
-                    <div className="ride-type-icon">🚙</div>
-                    <div className="ride-type-info">
-                      <div className="ride-type-name">{t('rideType.comfort')}</div>
-                      <div className="ride-type-price">{t('rideType.price.from')} 35 MAD</div>
-                    </div>
-                  </button>
-                  <button
-                    type="button"
-                    className={`ride-type ${rideType === 'xl' ? 'active' : ''}`}
-                    onClick={() => setRideType('xl')}
-                  >
-                    <div className="ride-type-icon">🚐</div>
-                    <div className="ride-type-info">
-                      <div className="ride-type-name">{t('rideType.xl')}</div>
-                      <div className="ride-type-price">{t('rideType.price.from')} 45 MAD</div>
-                    </div>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
                   </button>
                 </div>
+                {showPickupSuggestions && (
+                  <div className="pickup-suggestions">
+                    <button
+                      type="button"
+                      className="suggestion-item location-access"
+                      onClick={handleUseCurrentLocation}
+                    >
+                      <svg className="suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <div className="suggestion-content">
+                        <div className="suggestion-title">{t('location.allow')}</div>
+                        <div className="suggestion-subtitle">{t('location.allow.desc')}</div>
+                      </div>
+                    </button>
+                    {locationSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        className="suggestion-item"
+                        onClick={() => handleSelectSuggestion(suggestion.address)}
+                      >
+                        <svg className="suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <div className="suggestion-content">
+                          <div className="suggestion-title">{suggestion.address}</div>
+                          <div className="suggestion-subtitle">{suggestion.city}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <button type="submit" className="btn-book">
@@ -463,6 +599,95 @@ const Ride = () => {
           </div>
         </div>
       </section>
+
+      {/* Schedule Modal */}
+      {showScheduleModal && (
+        <div className="modal-overlay" onClick={handleScheduleCancel}>
+          <div className="schedule-modal" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="modal-close"
+              onClick={handleScheduleCancel}
+              aria-label="Close"
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <h3 className="modal-title">{t('schedule.modal.title')}</h3>
+            
+            <div className="schedule-options">
+              <label className="schedule-option">
+                <input
+                  type="radio"
+                  name="scheduleType"
+                  value="immediate"
+                  checked={scheduleType === 'immediate'}
+                  onChange={(e) => setScheduleType(e.target.value)}
+                />
+                <span className="radio-custom"></span>
+                <span className="option-label">{t('schedule.immediate')}</span>
+              </label>
+              
+              <label className="schedule-option">
+                <input
+                  type="radio"
+                  name="scheduleType"
+                  value="later"
+                  checked={scheduleType === 'later'}
+                  onChange={(e) => setScheduleType(e.target.value)}
+                />
+                <span className="radio-custom"></span>
+                <span className="option-label">{t('schedule.later')}</span>
+              </label>
+            </div>
+
+            {scheduleType === 'later' && (
+              <div className="schedule-datetime">
+                <div className="form-group">
+                  <label className="form-label">{t('schedule.date')}</label>
+                  <input
+                    type="date"
+                    value={scheduledDate}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    className="form-input"
+                    min={new Date().toISOString().split('T')[0]}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">{t('schedule.time')}</label>
+                  <input
+                    type="time"
+                    value={scheduledTime}
+                    onChange={(e) => setScheduledTime(e.target.value)}
+                    className="form-input"
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={handleScheduleCancel}
+              >
+                {t('schedule.cancel')}
+              </button>
+              <button
+                type="button"
+                className="btn-confirm"
+                onClick={handleScheduleConfirm}
+                disabled={scheduleType === 'later' && (!scheduledDate || !scheduledTime)}
+              >
+                {t('schedule.confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Features Section */}
       <section id="services" className="features-section">

@@ -368,53 +368,6 @@
   border-color: var(--morocco-red);
 }
 
-.ride-types {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
-}
-
-.ride-type {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  border: 2px solid var(--gray-200);
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.ride-type:hover {
-  border-color: var(--morocco-green);
-}
-
-.ride-type.active {
-  border-color: var(--morocco-red);
-  background: rgba(193, 39, 45, 0.05);
-}
-
-.ride-type-icon {
-  font-size: 1.5rem;
-}
-
-.ride-type-info {
-  flex: 1;
-  text-align: left;
-}
-
-.ride-type-name {
-  font-weight: 600;
-  color: var(--gray-900);
-  margin-bottom: 0.25rem;
-}
-
-.ride-type-price {
-  font-size: 0.875rem;
-  color: var(--gray-600);
-}
-
 .btn-book {
   padding: 1rem 2rem;
   background: linear-gradient(135deg, var(--morocco-red), var(--morocco-green));
@@ -431,6 +384,367 @@
 .btn-book:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(193, 39, 45, 0.4);
+}
+
+/* Schedule Button */
+.schedule-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  background: var(--gray-100);
+  border: 2px solid var(--gray-200);
+  border-radius: 8px;
+  color: var(--gray-700);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.schedule-button:hover {
+  background: var(--gray-200);
+  border-color: var(--gray-300);
+}
+
+.schedule-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--gray-600);
+}
+
+.schedule-arrow {
+  width: 16px;
+  height: 16px;
+  color: var(--gray-500);
+}
+
+/* Schedule Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 2rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.schedule-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-500);
+  transition: color 0.2s;
+  border-radius: 8px;
+}
+
+.modal-close:hover {
+  color: var(--gray-900);
+  background: var(--gray-100);
+}
+
+.modal-close svg {
+  width: 24px;
+  height: 24px;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 1.5rem;
+  padding-right: 2rem;
+}
+
+.schedule-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.schedule-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 2px solid var(--gray-200);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.schedule-option:hover {
+  border-color: var(--gray-300);
+  background: var(--gray-50);
+}
+
+.schedule-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.radio-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--gray-400);
+  border-radius: 50%;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.schedule-option input[type="radio"]:checked ~ .radio-custom {
+  border-color: var(--morocco-red);
+  background: var(--morocco-red);
+}
+
+.schedule-option input[type="radio"]:checked ~ .radio-custom::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+.schedule-option input[type="radio"]:checked ~ .option-label {
+  color: var(--gray-900);
+  font-weight: 600;
+}
+
+.option-label {
+  color: var(--gray-700);
+  font-weight: 500;
+  flex: 1;
+}
+
+.schedule-datetime {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--gray-50);
+  border-radius: 8px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  padding: 0.75rem 1.5rem;
+  background: white;
+  border: 2px solid var(--gray-200);
+  border-radius: 8px;
+  color: var(--gray-700);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  border-color: var(--gray-300);
+  background: var(--gray-50);
+}
+
+.btn-confirm {
+  padding: 0.75rem 1.5rem;
+  background: var(--gray-900);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-confirm:hover:not(:disabled) {
+  background: var(--gray-800);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Pickup Location Suggestions */
+.pickup-group {
+  position: relative;
+}
+
+.pickup-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pickup-input {
+  padding-right: 3rem;
+}
+
+.pickup-locate-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-700);
+  transition: color 0.2s;
+  border-radius: 4px;
+}
+
+.pickup-locate-btn:hover {
+  color: var(--morocco-red);
+  background: var(--gray-100);
+}
+
+.pickup-locate-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pickup-suggestions {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid var(--gray-200);
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--gray-100);
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: var(--gray-50);
+}
+
+.suggestion-item.location-access {
+  background: var(--gray-50);
+  border-bottom: 2px solid var(--gray-200);
+}
+
+.suggestion-item.location-access:hover {
+  background: var(--gray-100);
+}
+
+.suggestion-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--gray-600);
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.suggestion-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.suggestion-title {
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.suggestion-subtitle {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  line-height: 1.4;
+}
+
+/* Scrollbar for suggestions */
+.pickup-suggestions::-webkit-scrollbar {
+  width: 8px;
+}
+
+.pickup-suggestions::-webkit-scrollbar-track {
+  background: var(--gray-100);
+  border-radius: 4px;
+}
+
+.pickup-suggestions::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 4px;
+}
+
+.pickup-suggestions::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
 }
 
 /* Features Section */
@@ -716,10 +1030,6 @@
     display: none;
   }
 
-  .ride-types {
-    grid-template-columns: 1fr;
-  }
-
   .features-grid {
     grid-template-columns: 1fr;
   }
@@ -757,6 +1067,24 @@
   .language-dropdown {
     right: auto;
     left: 0;
+  }
+
+  .schedule-modal {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .schedule-datetime {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-cancel,
+  .btn-confirm {
+    width: 100%;
   }
 }
 
