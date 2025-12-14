@@ -1,6 +1,244 @@
 import { useState, useEffect } from 'react';
 import './ride.css';
 
+// Traductions pour la page ride
+const translations = {
+  ar: {
+    // Navigation
+    'nav.services': 'الخدمات',
+    'nav.safety': 'الأمان',
+    'nav.about': 'حول',
+    'nav.help': 'مساعدة',
+    'nav.login': 'تسجيل الدخول',
+    'nav.signup': 'التسجيل',
+    // Hero
+    'hero.title': 'احجز رحلتك في ثوانٍ',
+    'hero.subtitle': 'تنقل بسهولة في جميع أنحاء المغرب مع سائقين موثوقين وأسعار شفافة',
+    'booking.tab.ride': 'رحلة',
+    'booking.tab.delivery': 'توصيل',
+    'form.where': 'إلى أين تذهب؟',
+    'form.destination.placeholder': 'أدخل وجهتك',
+    'form.pickup': 'نقطة الانطلاق',
+    'form.pickup.placeholder': 'موقعك الحالي',
+    'form.rideType': 'نوع الرحلة',
+    'rideType.standard': 'عادي',
+    'rideType.comfort': 'راحة',
+    'rideType.xl': 'كبير',
+    'rideType.price.from': 'من',
+    'btn.book': 'احجز الآن',
+    // Features
+    'features.title': 'لماذا Grab Morocco؟',
+    'features.safety.title': 'أمان مضمون',
+    'features.safety.desc': 'جميع سائقينا موثوقون ومتدربون. تتبع رحلتك في الوقت الفعلي.',
+    'features.pricing.title': 'أسعار شفافة',
+    'features.pricing.desc': 'اعرف السعر قبل الحجز. لا مفاجآت، لا رسوم خفية.',
+    'features.fast.title': 'وصول سريع',
+    'features.fast.desc': 'متوسط وقت الانتظار 5 دقائق في المدن الكبرى في المغرب.',
+    'features.payment.title': 'دفع مرن',
+    'features.payment.desc': 'ادفع نقداً أو ببطاقة أو عبر محفظتك الإلكترونية.',
+    'features.available.title': 'متاح في كل مكان',
+    'features.available.desc': 'خدمة متاحة في جميع المدن الكبرى في المغرب، على مدار الساعة.',
+    'features.drivers.title': 'سائقون ممتازون',
+    'features.drivers.desc': 'أكثر من 50,000 سائق بمتوسط تقييم 4.8/5.',
+    // Stats
+    'stats.drivers': 'سائق نشط',
+    'stats.rides': 'رحلة شهرياً',
+    'stats.rating': 'متوسط التقييم',
+    'stats.cities': 'مدينة مغطاة',
+    // How it works
+    'howItWorks.title': 'كيف يعمل؟',
+    'howItWorks.step1.title': 'أدخل وجهتك',
+    'howItWorks.step1.desc': 'حدد المكان الذي تريد الذهاب إليه واختر نوع رحلتك',
+    'howItWorks.step2.title': 'يجدك سائق',
+    'howItWorks.step2.desc': 'يوفر نظامنا لك السائق الأقرب',
+    'howItWorks.step3.title': 'تتبع رحلتك',
+    'howItWorks.step3.desc': 'تتبع وصول سائقك ومسارك في الوقت الفعلي',
+    'howItWorks.step4.title': 'ادفع بسهولة',
+    'howItWorks.step4.desc': 'ادفع نقداً أو ببطاقة. بسيط وآمن',
+    // CTA
+    'cta.title': 'جاهز للانطلاق؟',
+    'cta.subtitle': 'قم بتنزيل تطبيق Grab Morocco واحجز رحلتك الأولى',
+    'cta.appStore.line1': 'تنزيل من',
+    'cta.appStore.line2': 'App Store',
+    'cta.googlePlay.line1': 'تنزيل من',
+    'cta.googlePlay.line2': 'Google Play',
+    // Footer
+    'footer.tagline': 'منصة النقل والتوصيل الأولى في المغرب',
+    'footer.company': 'الشركة',
+    'footer.company.about': 'حول',
+    'footer.company.careers': 'الوظائف',
+    'footer.company.blog': 'المدونة',
+    'footer.company.press': 'الصحافة',
+    'footer.services': 'الخدمات',
+    'footer.services.rides': 'الرحلات',
+    'footer.services.delivery': 'التوصيل',
+    'footer.services.package': 'توصيل الطرود',
+    'footer.services.driver': 'كن سائقاً',
+    'footer.support': 'الدعم',
+    'footer.support.help': 'مركز المساعدة',
+    'footer.support.safety': 'الأمان',
+    'footer.support.contact': 'اتصل بنا',
+    'footer.support.faq': 'الأسئلة الشائعة',
+    'footer.copyright': '© 2025 Grab Morocco. جميع الحقوق محفوظة.',
+  },
+  fr: {
+    // Navigation
+    'nav.services': 'Services',
+    'nav.safety': 'Sécurité',
+    'nav.about': 'À propos',
+    'nav.help': 'Aide',
+    'nav.login': 'Connexion',
+    'nav.signup': 'S\'inscrire',
+    // Hero
+    'hero.title': 'Réservez votre course en quelques secondes',
+    'hero.subtitle': 'Déplacez-vous facilement dans tout le Maroc avec des conducteurs vérifiés et des tarifs transparents',
+    'booking.tab.ride': 'Course',
+    'booking.tab.delivery': 'Livraison',
+    'form.where': 'Où allez-vous ?',
+    'form.destination.placeholder': 'Entrez votre destination',
+    'form.pickup': 'Point de départ',
+    'form.pickup.placeholder': 'Votre position actuelle',
+    'form.rideType': 'Type de course',
+    'rideType.standard': 'Standard',
+    'rideType.comfort': 'Confort',
+    'rideType.xl': 'XL',
+    'rideType.price.from': 'À partir de',
+    'btn.book': 'Réserver maintenant',
+    // Features
+    'features.title': 'Pourquoi choisir Grab Morocco ?',
+    'features.safety.title': 'Sécurité garantie',
+    'features.safety.desc': 'Tous nos conducteurs sont vérifiés et formés. Suivez votre course en temps réel.',
+    'features.pricing.title': 'Tarifs transparents',
+    'features.pricing.desc': 'Connaissez le prix avant de réserver. Pas de surprises, pas de frais cachés.',
+    'features.fast.title': 'Arrivée rapide',
+    'features.fast.desc': 'Temps d\'attente moyen de 5 minutes dans les grandes villes du Maroc.',
+    'features.payment.title': 'Paiement flexible',
+    'features.payment.desc': 'Payez en espèces, par carte ou via votre portefeuille électronique.',
+    'features.available.title': 'Disponible partout',
+    'features.available.desc': 'Service disponible dans toutes les grandes villes du Maroc, 24/7.',
+    'features.drivers.title': 'Conducteurs étoiles',
+    'features.drivers.desc': 'Plus de 50 000 conducteurs avec une note moyenne de 4.8/5.',
+    // Stats
+    'stats.drivers': 'Conducteurs actifs',
+    'stats.rides': 'Courses par mois',
+    'stats.rating': 'Note moyenne',
+    'stats.cities': 'Villes couvertes',
+    // How it works
+    'howItWorks.title': 'Comment ça marche ?',
+    'howItWorks.step1.title': 'Entrez votre destination',
+    'howItWorks.step1.desc': 'Indiquez où vous voulez aller et choisissez votre type de course',
+    'howItWorks.step2.title': 'Un conducteur vous trouve',
+    'howItWorks.step2.desc': 'Notre système vous met en relation avec le conducteur le plus proche',
+    'howItWorks.step3.title': 'Suivez votre course',
+    'howItWorks.step3.desc': 'Suivez en temps réel l\'arrivée de votre conducteur et votre trajet',
+    'howItWorks.step4.title': 'Payez facilement',
+    'howItWorks.step4.desc': 'Payez en espèces ou par carte. Simple et sécurisé',
+    // CTA
+    'cta.title': 'Prêt à partir ?',
+    'cta.subtitle': 'Téléchargez l\'application Grab Morocco et réservez votre première course',
+    'cta.appStore.line1': 'Télécharger sur',
+    'cta.appStore.line2': 'App Store',
+    'cta.googlePlay.line1': 'Télécharger sur',
+    'cta.googlePlay.line2': 'Google Play',
+    // Footer
+    'footer.tagline': 'La plateforme de transport et livraison #1 au Maroc',
+    'footer.company': 'Entreprise',
+    'footer.company.about': 'À propos',
+    'footer.company.careers': 'Carrières',
+    'footer.company.blog': 'Blog',
+    'footer.company.press': 'Presse',
+    'footer.services': 'Services',
+    'footer.services.rides': 'Courses',
+    'footer.services.delivery': 'Livraison',
+    'footer.services.package': 'Livraison de colis',
+    'footer.services.driver': 'Devenir conducteur',
+    'footer.support': 'Support',
+    'footer.support.help': 'Centre d\'aide',
+    'footer.support.safety': 'Sécurité',
+    'footer.support.contact': 'Nous contacter',
+    'footer.support.faq': 'FAQ',
+    'footer.copyright': '© 2025 Grab Morocco. Tous droits réservés.',
+  },
+  en: {
+    // Navigation
+    'nav.services': 'Services',
+    'nav.safety': 'Safety',
+    'nav.about': 'About',
+    'nav.help': 'Help',
+    'nav.login': 'Login',
+    'nav.signup': 'Sign up',
+    // Hero
+    'hero.title': 'Book your ride in seconds',
+    'hero.subtitle': 'Move easily throughout Morocco with verified drivers and transparent pricing',
+    'booking.tab.ride': 'Ride',
+    'booking.tab.delivery': 'Delivery',
+    'form.where': 'Where are you going?',
+    'form.destination.placeholder': 'Enter your destination',
+    'form.pickup': 'Pickup point',
+    'form.pickup.placeholder': 'Your current location',
+    'form.rideType': 'Ride type',
+    'rideType.standard': 'Standard',
+    'rideType.comfort': 'Comfort',
+    'rideType.xl': 'XL',
+    'rideType.price.from': 'From',
+    'btn.book': 'Book now',
+    // Features
+    'features.title': 'Why choose Grab Morocco?',
+    'features.safety.title': 'Guaranteed safety',
+    'features.safety.desc': 'All our drivers are verified and trained. Track your ride in real-time.',
+    'features.pricing.title': 'Transparent pricing',
+    'features.pricing.desc': 'Know the price before booking. No surprises, no hidden fees.',
+    'features.fast.title': 'Fast arrival',
+    'features.fast.desc': 'Average waiting time of 5 minutes in major cities in Morocco.',
+    'features.payment.title': 'Flexible payment',
+    'features.payment.desc': 'Pay in cash, by card, or via your e-wallet.',
+    'features.available.title': 'Available everywhere',
+    'features.available.desc': 'Service available in all major cities in Morocco, 24/7.',
+    'features.drivers.title': 'Star drivers',
+    'features.drivers.desc': 'More than 50,000 drivers with an average rating of 4.8/5.',
+    // Stats
+    'stats.drivers': 'Active drivers',
+    'stats.rides': 'Rides per month',
+    'stats.rating': 'Average rating',
+    'stats.cities': 'Cities covered',
+    // How it works
+    'howItWorks.title': 'How does it work?',
+    'howItWorks.step1.title': 'Enter your destination',
+    'howItWorks.step1.desc': 'Specify where you want to go and choose your ride type',
+    'howItWorks.step2.title': 'A driver finds you',
+    'howItWorks.step2.desc': 'Our system connects you with the nearest driver',
+    'howItWorks.step3.title': 'Track your ride',
+    'howItWorks.step3.desc': 'Track your driver\'s arrival and your journey in real-time',
+    'howItWorks.step4.title': 'Pay easily',
+    'howItWorks.step4.desc': 'Pay in cash or by card. Simple and secure',
+    // CTA
+    'cta.title': 'Ready to go?',
+    'cta.subtitle': 'Download the Grab Morocco app and book your first ride',
+    'cta.appStore.line1': 'Download on',
+    'cta.appStore.line2': 'App Store',
+    'cta.googlePlay.line1': 'Download on',
+    'cta.googlePlay.line2': 'Google Play',
+    // Footer
+    'footer.tagline': 'Morocco\'s #1 transport and delivery platform',
+    'footer.company': 'Company',
+    'footer.company.about': 'About us',
+    'footer.company.careers': 'Careers',
+    'footer.company.blog': 'Blog',
+    'footer.company.press': 'Press',
+    'footer.services': 'Services',
+    'footer.services.rides': 'Rides',
+    'footer.services.delivery': 'Delivery',
+    'footer.services.package': 'Package delivery',
+    'footer.services.driver': 'Become a driver',
+    'footer.support': 'Support',
+    'footer.support.help': 'Help center',
+    'footer.support.safety': 'Safety',
+    'footer.support.contact': 'Contact us',
+    'footer.support.faq': 'FAQ',
+    'footer.copyright': '© 2025 Grab Morocco. All rights reserved.',
+  },
+};
+
 const Ride = () => {
   const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
@@ -9,6 +247,11 @@ const Ride = () => {
     return localStorage.getItem('language') || 'fr';
   });
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+
+  // Fonction de traduction
+  const t = (key) => {
+    return translations[language]?.[key] || key;
+  };
 
   const handleBookRide = (e) => {
     e.preventDefault();
@@ -58,10 +301,10 @@ const Ride = () => {
           </div>
           
           <nav className="header-nav">
-            <a href="#services" className="nav-link">Services</a>
-            <a href="#safety" className="nav-link">Sécurité</a>
-            <a href="#about" className="nav-link">À propos</a>
-            <a href="#help" className="nav-link">Aide</a>
+            <a href="#services" className="nav-link">{t('nav.services')}</a>
+            <a href="#safety" className="nav-link">{t('nav.safety')}</a>
+            <a href="#about" className="nav-link">{t('nav.about')}</a>
+            <a href="#help" className="nav-link">{t('nav.help')}</a>
           </nav>
 
           <div className="header-actions">
@@ -108,8 +351,8 @@ const Ride = () => {
                 </div>
               )}
             </div>
-            <button className="btn-login">Connexion</button>
-            <button className="btn-signup">S'inscrire</button>
+            <button className="btn-login">{t('nav.login')}</button>
+            <button className="btn-signup">{t('nav.signup')}</button>
           </div>
         </div>
       </header>
@@ -123,18 +366,18 @@ const Ride = () => {
         <div className="hero-content">
           <div className="hero-text">
             <h1 className="hero-title">
-              Réservez votre course en quelques secondes
+              {t('hero.title')}
             </h1>
             <p className="hero-subtitle">
-              Déplacez-vous facilement dans tout le Maroc avec des conducteurs vérifiés et des tarifs transparents
+              {t('hero.subtitle')}
             </p>
           </div>
 
           {/* Booking Form */}
           <div className="booking-card">
             <div className="booking-tabs">
-              <button className="tab active">Course</button>
-              <button className="tab">Livraison</button>
+              <button className="tab active">{t('booking.tab.ride')}</button>
+              <button className="tab">{t('booking.tab.delivery')}</button>
             </div>
 
             <form onSubmit={handleBookRide} className="booking-form">
@@ -144,11 +387,11 @@ const Ride = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  Où allez-vous ?
+                  {t('form.where')}
                 </label>
                 <input
                   type="text"
-                  placeholder="Entrez votre destination"
+                  placeholder={t('form.destination.placeholder')}
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                   className="form-input"
@@ -161,11 +404,11 @@ const Ride = () => {
                   <svg className="form-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  Point de départ
+                  {t('form.pickup')}
                 </label>
                 <input
                   type="text"
-                  placeholder="Votre position actuelle"
+                  placeholder={t('form.pickup.placeholder')}
                   value={pickup}
                   onChange={(e) => setPickup(e.target.value)}
                   className="form-input"
@@ -174,7 +417,7 @@ const Ride = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Type de course</label>
+                <label className="form-label">{t('form.rideType')}</label>
                 <div className="ride-types">
                   <button
                     type="button"
@@ -183,8 +426,8 @@ const Ride = () => {
                   >
                     <div className="ride-type-icon">🚗</div>
                     <div className="ride-type-info">
-                      <div className="ride-type-name">Standard</div>
-                      <div className="ride-type-price">À partir de 25 MAD</div>
+                      <div className="ride-type-name">{t('rideType.standard')}</div>
+                      <div className="ride-type-price">{t('rideType.price.from')} 25 MAD</div>
                     </div>
                   </button>
                   <button
@@ -194,8 +437,8 @@ const Ride = () => {
                   >
                     <div className="ride-type-icon">🚙</div>
                     <div className="ride-type-info">
-                      <div className="ride-type-name">Confort</div>
-                      <div className="ride-type-price">À partir de 35 MAD</div>
+                      <div className="ride-type-name">{t('rideType.comfort')}</div>
+                      <div className="ride-type-price">{t('rideType.price.from')} 35 MAD</div>
                     </div>
                   </button>
                   <button
@@ -205,15 +448,15 @@ const Ride = () => {
                   >
                     <div className="ride-type-icon">🚐</div>
                     <div className="ride-type-info">
-                      <div className="ride-type-name">XL</div>
-                      <div className="ride-type-price">À partir de 45 MAD</div>
+                      <div className="ride-type-name">{t('rideType.xl')}</div>
+                      <div className="ride-type-price">{t('rideType.price.from')} 45 MAD</div>
                     </div>
                   </button>
                 </div>
               </div>
 
               <button type="submit" className="btn-book">
-                Réserver maintenant
+                {t('btn.book')}
               </button>
             </form>
           </div>
@@ -223,54 +466,54 @@ const Ride = () => {
       {/* Features Section */}
       <section id="services" className="features-section">
         <div className="container">
-          <h2 className="section-title">Pourquoi choisir Grab Morocco ?</h2>
+          <h2 className="section-title">{t('features.title')}</h2>
           
           <div className="features-grid">
             <div className="feature-card">
               <div className="feature-icon">🛡️</div>
-              <h3 className="feature-title">Sécurité garantie</h3>
+              <h3 className="feature-title">{t('features.safety.title')}</h3>
               <p className="feature-description">
-                Tous nos conducteurs sont vérifiés et formés. Suivez votre course en temps réel.
+                {t('features.safety.desc')}
               </p>
             </div>
 
             <div className="feature-card">
               <div className="feature-icon">💰</div>
-              <h3 className="feature-title">Tarifs transparents</h3>
+              <h3 className="feature-title">{t('features.pricing.title')}</h3>
               <p className="feature-description">
-                Connaissez le prix avant de réserver. Pas de surprises, pas de frais cachés.
+                {t('features.pricing.desc')}
               </p>
             </div>
 
             <div className="feature-card">
               <div className="feature-icon">⚡</div>
-              <h3 className="feature-title">Arrivée rapide</h3>
+              <h3 className="feature-title">{t('features.fast.title')}</h3>
               <p className="feature-description">
-                Temps d'attente moyen de 5 minutes dans les grandes villes du Maroc.
+                {t('features.fast.desc')}
               </p>
             </div>
 
             <div className="feature-card">
               <div className="feature-icon">📱</div>
-              <h3 className="feature-title">Paiement flexible</h3>
+              <h3 className="feature-title">{t('features.payment.title')}</h3>
               <p className="feature-description">
-                Payez en espèces, par carte ou via votre portefeuille électronique.
+                {t('features.payment.desc')}
               </p>
             </div>
 
             <div className="feature-card">
               <div className="feature-icon">🌍</div>
-              <h3 className="feature-title">Disponible partout</h3>
+              <h3 className="feature-title">{t('features.available.title')}</h3>
               <p className="feature-description">
-                Service disponible dans toutes les grandes villes du Maroc, 24/7.
+                {t('features.available.desc')}
               </p>
             </div>
 
             <div className="feature-card">
               <div className="feature-icon">⭐</div>
-              <h3 className="feature-title">Conducteurs étoiles</h3>
+              <h3 className="feature-title">{t('features.drivers.title')}</h3>
               <p className="feature-description">
-                Plus de 50 000 conducteurs avec une note moyenne de 4.8/5.
+                {t('features.drivers.desc')}
               </p>
             </div>
           </div>
@@ -283,19 +526,19 @@ const Ride = () => {
           <div className="stats-grid">
             <div className="stat-item">
               <div className="stat-number">50K+</div>
-              <div className="stat-label">Conducteurs actifs</div>
+              <div className="stat-label">{t('stats.drivers')}</div>
             </div>
             <div className="stat-item">
               <div className="stat-number">1M+</div>
-              <div className="stat-label">Courses par mois</div>
+              <div className="stat-label">{t('stats.rides')}</div>
             </div>
             <div className="stat-item">
               <div className="stat-number">4.8★</div>
-              <div className="stat-label">Note moyenne</div>
+              <div className="stat-label">{t('stats.rating')}</div>
             </div>
             <div className="stat-item">
               <div className="stat-number">15+</div>
-              <div className="stat-label">Villes couvertes</div>
+              <div className="stat-label">{t('stats.cities')}</div>
             </div>
           </div>
         </div>
@@ -304,38 +547,38 @@ const Ride = () => {
       {/* How It Works */}
       <section id="about" className="how-it-works">
         <div className="container">
-          <h2 className="section-title">Comment ça marche ?</h2>
+          <h2 className="section-title">{t('howItWorks.title')}</h2>
           
           <div className="steps-grid">
             <div className="step-item">
               <div className="step-number">1</div>
-              <h3 className="step-title">Entrez votre destination</h3>
+              <h3 className="step-title">{t('howItWorks.step1.title')}</h3>
               <p className="step-description">
-                Indiquez où vous voulez aller et choisissez votre type de course
+                {t('howItWorks.step1.desc')}
               </p>
             </div>
 
             <div className="step-item">
               <div className="step-number">2</div>
-              <h3 className="step-title">Un conducteur vous trouve</h3>
+              <h3 className="step-title">{t('howItWorks.step2.title')}</h3>
               <p className="step-description">
-                Notre système vous met en relation avec le conducteur le plus proche
+                {t('howItWorks.step2.desc')}
               </p>
             </div>
 
             <div className="step-item">
               <div className="step-number">3</div>
-              <h3 className="step-title">Suivez votre course</h3>
+              <h3 className="step-title">{t('howItWorks.step3.title')}</h3>
               <p className="step-description">
-                Suivez en temps réel l'arrivée de votre conducteur et votre trajet
+                {t('howItWorks.step3.desc')}
               </p>
             </div>
 
             <div className="step-item">
               <div className="step-number">4</div>
-              <h3 className="step-title">Payez facilement</h3>
+              <h3 className="step-title">{t('howItWorks.step4.title')}</h3>
               <p className="step-description">
-                Payez en espèces ou par carte. Simple et sécurisé
+                {t('howItWorks.step4.desc')}
               </p>
             </div>
           </div>
@@ -346,22 +589,28 @@ const Ride = () => {
       <section className="cta-section">
         <div className="container">
           <div className="cta-content">
-            <h2 className="cta-title">Prêt à partir ?</h2>
+            <h2 className="cta-title">{t('cta.title')}</h2>
             <p className="cta-subtitle">
-              Téléchargez l'application Grab Morocco et réservez votre première course
+              {t('cta.subtitle')}
             </p>
             <div className="cta-buttons">
               <button className="btn-app-store">
                 <svg className="app-icon" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C1.79 15.25 2.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                 </svg>
-                Télécharger sur<br />App Store
+                <div>
+                  {t('cta.appStore.line1')}<br />
+                  {t('cta.appStore.line2')}
+                </div>
               </button>
               <button className="btn-google-play">
                 <svg className="app-icon" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
                 </svg>
-                Télécharger sur<br />Google Play
+                <div>
+                  {t('cta.googlePlay.line1')}<br />
+                  {t('cta.googlePlay.line2')}
+                </div>
               </button>
             </div>
           </div>
@@ -378,44 +627,44 @@ const Ride = () => {
                 <span className="logo-text">Grab Morocco</span>
               </div>
               <p className="footer-tagline">
-                La plateforme de transport et livraison #1 au Maroc
+                {t('footer.tagline')}
               </p>
             </div>
 
             <div className="footer-column">
-              <h4 className="footer-title">Entreprise</h4>
+              <h4 className="footer-title">{t('footer.company')}</h4>
               <ul className="footer-links">
-                <li><a href="#">À propos</a></li>
-                <li><a href="#">Carrières</a></li>
-                <li><a href="#">Blog</a></li>
-                <li><a href="#">Presse</a></li>
+                <li><a href="#">{t('footer.company.about')}</a></li>
+                <li><a href="#">{t('footer.company.careers')}</a></li>
+                <li><a href="#">{t('footer.company.blog')}</a></li>
+                <li><a href="#">{t('footer.company.press')}</a></li>
               </ul>
             </div>
 
             <div className="footer-column">
-              <h4 className="footer-title">Services</h4>
+              <h4 className="footer-title">{t('footer.services')}</h4>
               <ul className="footer-links">
-                <li><a href="#">Courses</a></li>
-                <li><a href="#">Livraison</a></li>
-                <li><a href="#">Livraison de colis</a></li>
-                <li><a href="#">Devenir conducteur</a></li>
+                <li><a href="#">{t('footer.services.rides')}</a></li>
+                <li><a href="#">{t('footer.services.delivery')}</a></li>
+                <li><a href="#">{t('footer.services.package')}</a></li>
+                <li><a href="#">{t('footer.services.driver')}</a></li>
               </ul>
             </div>
 
             <div className="footer-column">
-              <h4 className="footer-title">Support</h4>
+              <h4 className="footer-title">{t('footer.support')}</h4>
               <ul className="footer-links">
-                <li><a href="#">Centre d'aide</a></li>
-                <li><a href="#">Sécurité</a></li>
-                <li><a href="#">Nous contacter</a></li>
-                <li><a href="#">FAQ</a></li>
+                <li><a href="#">{t('footer.support.help')}</a></li>
+                <li><a href="#">{t('footer.support.safety')}</a></li>
+                <li><a href="#">{t('footer.support.contact')}</a></li>
+                <li><a href="#">{t('footer.support.faq')}</a></li>
               </ul>
             </div>
           </div>
 
           <div className="footer-bottom">
             <div className="footer-copyright">
-              © 2025 Grab Morocco. Tous droits réservés.
+              {t('footer.copyright')}
             </div>
             <div className="footer-social">
               <a href="#" className="social-link">Facebook</a>
