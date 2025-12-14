@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-import Login from './pages/Login.tsx'
-import Signup from './pages/Signup.tsx'
-import Home from './pages/Home.tsx'
-import './App.css'
-=======
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -15,7 +9,6 @@ import Food from "./pages/food";
 
 import "./App.css";
 // ...existing code...
->>>>>>> 0b72134de16279fdf682509adf63d2c3c6639949
 
 function App() {
   const handleSelectRestaurant = (restaurant: any) => {
@@ -23,14 +16,6 @@ function App() {
   };
 
   return (
-<<<<<<< HEAD
-    <div className="App">
-      <Home />
-      <Signup />
-      <Login />
-    </div>
-  )
-=======
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -43,7 +28,6 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
->>>>>>> 0b72134de16279fdf682509adf63d2c3c6639949
 }
 
 
