@@ -1,0 +1,80 @@
+📦 GRAB MOROCCO - FRONTEND PROJECT STRUCTURE
+═══════════════════════════════════════════════════════════════
+
+frontend/
+│
+├── 📄 Configuration Files
+│   ├── index.html              (React entry point + Tailwind CDN)
+│   ├── package.json            (Dependencies)
+│   ├── vite.config.ts          (Vite config)
+│   ├── tsconfig.json           (TypeScript config)
+│   └── eslint.config.js        (Linting rules)
+│
+├── 📁 public/                  (Static public files)
+│   └── vite.svg
+│
+└── 📁 src/                     (Source code)
+    │
+    ├── 📄 Entry Files
+    │   ├── main.tsx            → React app starts here
+    │   ├── App.tsx             → Renders HomePage
+    │   ├── index.css           → Global styles
+    │   └── App.css             → App styles
+    │
+    ├── 📁 pages/               ⭐ MAIN PAGES
+    │   └── HomePage.tsx         → Landing page (converted from HTML)
+    │
+    ├── 📁 components/          (Reusable UI components)
+    │   └── driver/
+    │
+    ├── 📁 features/            (Feature modules - future development)
+    │   ├── admin/admin.jsx
+    │   ├── auth/auth.jsx
+    │   ├── driver/driver.jsx
+    │   ├── notification/notification.jsx
+    │   ├── payment/payment.jsx
+    │   ├── restaurant/restaurant.jsx
+    │   ├── ride/ride.jsx
+    │   └── user/user.jsx
+    │
+    ├── 📁 assets/              ⭐ STATIC ASSETS
+    │   ├── css/
+    │   │   └── styles.css       → Custom CSS (animations, RTL, patterns)
+    │   └── images/
+    │       └── icons/          → 7 SVG icons (car, clock, etc.)
+    │
+    ├── 📁 utils/               ⭐ UTILITIES
+    │   └── translations.ts     → i18n system (AR/FR/EN)
+    │
+    ├── 📁 shared/              (Shared code)
+    │   ├── components/
+    │   ├── hooks/
+    │   └── lib/
+    │
+    ├── 📁 types/               (TypeScript types)
+    │
+    ├── 📁 i18n/                (Internationalization)
+    │   └── locales/
+    │
+    └── 📁 main/                ⚠️ OLD FILES (can be deleted)
+        └── resources/          → Legacy structure (not used)
+
+═══════════════════════════════════════════════════════════════
+
+🎯 KEY FILES TO KNOW:
+
+1. HomePage.tsx          → Main landing page component
+2. translations.ts       → Language switching system
+3. styles.css            → Custom animations & RTL support
+4. App.tsx               → App entry component
+
+═══════════════════════════════════════════════════════════════
+
+🚀 QUICK START:
+
+npm install    → Install dependencies
+npm run dev    → Start development server
+npm run build  → Build for production
+
+═══════════════════════════════════════════════════════════════
+
