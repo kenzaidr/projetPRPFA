@@ -1,16 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './ride.css';
 
 const Ride = () => {
   const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
   const [rideType, setRideType] = useState('standard');
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('language') || 'fr';
+  });
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
 
   const handleBookRide = (e) => {
     e.preventDefault();
     // Logique de réservation à implémenter
     console.log('Réservation:', { pickup, destination, rideType });
   };
+
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    localStorage.setItem('language', lang);
+    setShowLanguageDropdown(false);
+    // Mettre à jour la direction du document pour RTL/LTR
+    document.documentElement.setAttribute('lang', lang);
+    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+    document.body.className = document.body.className.replace(/\b(rtl|ltr)\b/g, '');
+    document.body.classList.add(lang === 'ar' ? 'rtl' : 'ltr');
+  };
+
+  useEffect(() => {
+    // Appliquer la langue au chargement
+    const savedLang = localStorage.getItem('language') || 'fr';
+    document.documentElement.setAttribute('lang', savedLang);
+    document.documentElement.setAttribute('dir', savedLang === 'ar' ? 'rtl' : 'ltr');
+    document.body.className = document.body.className.replace(/\b(rtl|ltr)\b/g, '');
+    document.body.classList.add(savedLang === 'ar' ? 'rtl' : 'ltr');
+  }, []);
+
+  // Fermer le dropdown quand on clique en dehors
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showLanguageDropdown && !event.target.closest('.language-switcher')) {
+        setShowLanguageDropdown(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showLanguageDropdown]);
 
   return (
     <div className="ride-landing">
@@ -30,6 +65,49 @@ const Ride = () => {
           </nav>
 
           <div className="header-actions">
+            <div className="language-switcher">
+              <button 
+                className="btn-language"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowLanguageDropdown(!showLanguageDropdown);
+                }}
+                aria-label="Changer de langue"
+              >
+                <svg className="language-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                </svg>
+                <span className="language-code">{language.toUpperCase()}</span>
+              </button>
+              {showLanguageDropdown && (
+                <div className="language-dropdown">
+                  <button
+                    className={`language-option ${language === 'ar' ? 'active' : ''}`}
+                    onClick={() => handleLanguageChange('ar')}
+                    data-lang="ar"
+                  >
+                    <span className="language-flag">🇲🇦</span>
+                    <span className="language-name">العربية</span>
+                  </button>
+                  <button
+                    className={`language-option ${language === 'fr' ? 'active' : ''}`}
+                    onClick={() => handleLanguageChange('fr')}
+                    data-lang="fr"
+                  >
+                    <span className="language-flag">🇫🇷</span>
+                    <span className="language-name">Français</span>
+                  </button>
+                  <button
+                    className={`language-option ${language === 'en' ? 'active' : ''}`}
+                    onClick={() => handleLanguageChange('en')}
+                    data-lang="en"
+                  >
+                    <span className="language-flag">🇬🇧</span>
+                    <span className="language-name">English</span>
+                  </button>
+                </div>
+              )}
+            </div>
             <button className="btn-login">Connexion</button>
             <button className="btn-signup">S'inscrire</button>
           </div>
