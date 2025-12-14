@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './ride.css';
 
 // Traductions pour la page ride
@@ -295,10 +296,10 @@ const Ride = () => {
       {/* Header */}
       <header className="ride-header">
         <div className="header-container">
-          <div className="logo-section">
+          <Link to="/" className="logo-section">
             <div className="logo-icon">G</div>
             <span className="logo-text">Grab Morocco</span>
-          </div>
+          </Link>
           
           <nav className="header-nav">
             <a href="#services" className="nav-link">{t('nav.services')}</a>
