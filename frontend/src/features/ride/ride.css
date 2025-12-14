@@ -295,6 +295,15 @@
   height: 18px;
 }
 
+.add-destination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-destination-btn:disabled:hover {
+  background: #000000;
+}
+
 /* Dropdown */
 .dropdown-wrapper {
   position: relative;
