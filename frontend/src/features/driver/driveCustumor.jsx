@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './driveCustumor.css';
 
 // Traductions pour la page ride
@@ -282,6 +282,7 @@ const translations = {
 };
 
 const Ride = () => {
+  const navigate = useNavigate();
   const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
   const [rideType, setRideType] = useState('standard');
@@ -306,13 +307,16 @@ const Ride = () => {
 
   const handleBookRide = (e) => {
     e.preventDefault();
-    // Logique de réservation à implémenter
-    console.log('Réservation:', { 
-      pickup, 
-      destination, 
-      scheduleType,
-      scheduledDate: scheduleType === 'later' ? scheduledDate : null,
-      scheduledTime: scheduleType === 'later' ? scheduledTime : null
+    // Rediriger vers la page de réservation avec les données du formulaire
+    navigate('/ride/booking', {
+      state: {
+        pickup,
+        destination,
+        scheduleType,
+        scheduledDate: scheduleType === 'later' ? scheduledDate : null,
+        scheduledTime: scheduleType === 'later' ? scheduledTime : null,
+        rideType
+      }
     });
   };
 

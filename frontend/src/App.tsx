@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import DriverDashboard from './features/driver/DriverDashboard.tsx';
 import Ride from './features/driver/driveCustumor.jsx';
+import RideBooking from './features/ride/ride.jsx';
 
 const App: React.FC = () => {
   return (
@@ -11,6 +12,7 @@ const App: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/driver" element={<DriverDashboard />} />
         <Route path="/ride" element={<Ride />} />
+        <Route path="/ride/booking" element={<RideBooking />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
