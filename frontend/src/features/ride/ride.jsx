@@ -7,6 +7,7 @@ const RideBooking = () => {
   const location = useLocation();
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const currentLocationMarkerRef = useRef(null);
   
   // Récupérer les données du formulaire précédent si disponibles
   const [pickup, setPickup] = useState(location.state?.pickup || '');
@@ -26,8 +27,52 @@ const RideBooking = () => {
   const [showScheduleDropdown, setShowScheduleDropdown] = useState(false);
   const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showPickupDropdown, setShowPickupDropdown] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentAddress, setCurrentAddress] = useState('');
   const profileMenuRef = useRef(null);
   const profileButtonRef = useRef(null);
+  const pickupInputRef = useRef(null);
+  const pickupDropdownRef = useRef(null);
+
+  // Obtenir la position actuelle de l'utilisateur
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({ lat: latitude, lng: longitude });
+          
+          // Géocoder les coordonnées pour obtenir l'adresse
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            );
+            const data = await response.json();
+            if (data && data.address) {
+              const addressParts = [];
+              if (data.address.road) addressParts.push(data.address.road);
+              if (data.address.house_number) addressParts.push(data.address.house_number);
+              if (addressParts.length === 0 && data.address.suburb) addressParts.push(data.address.suburb);
+              if (addressParts.length === 0 && data.address.city) addressParts.push(data.address.city);
+              
+              const fullAddress = addressParts.length > 0 
+                ? addressParts.join(' ')
+                : data.display_name?.split(',')[0] || 'Adresse actuelle';
+              setCurrentAddress(fullAddress);
+            }
+          } catch (error) {
+            console.error('Erreur lors du géocodage:', error);
+            setCurrentAddress('Votre emplacement actuel');
+          }
+        },
+        (error) => {
+          console.error('Erreur de géolocalisation:', error);
+          setCurrentAddress('Votre emplacement actuel');
+        }
+      );
+    }
+  }, []);
 
   // Fermer les dropdowns quand on clique en dehors
   useEffect(() => {
@@ -43,6 +88,14 @@ const RideBooking = () => {
         !profileButtonRef.current.contains(event.target)
       ) {
         setShowProfileMenu(false);
+      }
+      if (
+        pickupDropdownRef.current &&
+        pickupInputRef.current &&
+        !pickupDropdownRef.current.contains(event.target) &&
+        !pickupInputRef.current.contains(event.target)
+      ) {
+        setShowPickupDropdown(false);
       }
     };
     document.addEventListener('click', handleClickOutside);
@@ -120,6 +173,70 @@ const RideBooking = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Ajouter un marqueur sur la carte quand la localisation actuelle est détectée
+  useEffect(() => {
+    if (mapInstanceRef.current && currentLocation && window.L) {
+      const { lat, lng } = currentLocation;
+
+      // Supprimer le marqueur précédent s'il existe
+      if (currentLocationMarkerRef.current) {
+        mapInstanceRef.current.removeLayer(currentLocationMarkerRef.current);
+        currentLocationMarkerRef.current = null;
+      }
+
+      // Créer un marqueur personnalisé avec une icône de localisation
+      const customIcon = window.L.divIcon({
+        className: 'current-location-marker',
+        html: `
+          <div style="
+            width: 40px;
+            height: 40px;
+            background: #000000;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          ">
+            <div style="
+              width: 12px;
+              height: 12px;
+              background: #ffffff;
+              border-radius: 50%;
+            "></div>
+          </div>
+        `,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -20]
+      });
+
+      // Créer et ajouter le marqueur
+      const marker = window.L.marker([lat, lng], { icon: customIcon })
+        .addTo(mapInstanceRef.current);
+
+      // Centrer la carte sur la position actuelle
+      mapInstanceRef.current.setView([lat, lng], 15);
+
+      // Stocker la référence du marqueur
+      currentLocationMarkerRef.current = marker;
+
+      // Ajouter un popup avec l'adresse si disponible
+      if (currentAddress) {
+        marker.bindPopup(`<strong>${currentAddress}</strong><br>Votre emplacement actuel`).openPopup();
+      }
+    }
+
+    // Nettoyer le marqueur lors du démontage
+    return () => {
+      if (currentLocationMarkerRef.current && mapInstanceRef.current) {
+        mapInstanceRef.current.removeLayer(currentLocationMarkerRef.current);
+        currentLocationMarkerRef.current = null;
+      }
+    };
+  }, [currentLocation, currentAddress]);
 
   // Mettre à jour la carte quand pickup ou destination change
   useEffect(() => {
@@ -436,14 +553,75 @@ const RideBooking = () => {
                 </svg>
                 Lieu de prise en charge
               </label>
-              <input
-                type="text"
-                className="field-input"
-                placeholder="Entrez votre adresse"
-                value={pickup}
-                onChange={(e) => setPickup(e.target.value)}
-                required
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  ref={pickupInputRef}
+                  type="text"
+                  className="field-input"
+                  placeholder="Lieu de prise en charge"
+                  value={pickup}
+                  onChange={(e) => setPickup(e.target.value)}
+                  onFocus={() => {
+                    setShowPickupDropdown(true);
+                    setShowScheduleDropdown(false);
+                    setShowPassengerDropdown(false);
+                  }}
+                  onClick={() => {
+                    setShowPickupDropdown(true);
+                    setShowScheduleDropdown(false);
+                    setShowPassengerDropdown(false);
+                  }}
+                  required
+                />
+                {showPickupDropdown && (
+                  <div 
+                    ref={pickupDropdownRef}
+                    className="pickup-dropdown"
+                  >
+                    {currentAddress && (
+                      <button
+                        type="button"
+                        className="pickup-option pickup-option-current"
+                        onClick={() => {
+                          setPickup(currentAddress);
+                          setShowPickupDropdown(false);
+                        }}
+                      >
+                        <div className="pickup-option-icon pickup-option-icon-current">
+                          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </div>
+                        <div className="pickup-option-content">
+                          <div className="pickup-option-title">{currentAddress}</div>
+                          <div className="pickup-option-subtitle">Votre emplacement actuel</div>
+                        </div>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="pickup-option pickup-option-manual"
+                      onClick={() => {
+                        // Logique pour ouvrir la carte et permettre de sélectionner un emplacement
+                        setShowPickupDropdown(false);
+                        // Ici vous pouvez ajouter la logique pour ouvrir un modal de carte
+                        alert('Fonctionnalité de sélection sur la carte à implémenter');
+                      }}
+                    >
+                      <div className="pickup-option-icon pickup-option-icon-manual">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      </div>
+                      <div className="pickup-option-content">
+                        <div className="pickup-option-title">Indiquer l'emplacement sur la carte</div>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Destination */}
