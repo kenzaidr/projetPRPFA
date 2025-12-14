@@ -3,6 +3,7 @@ export type Language = 'ar' | 'fr' | 'en';
 export interface TranslationConfig {
     lang: string;
     dir: 'rtl' | 'ltr';
+    label?: string;
 }
 
 export interface RideRequest {
@@ -22,3 +23,19 @@ export interface DriverStats {
     onlineHours: number;
     acceptanceRate: number;
 }
+
+export type PartnerRegistrationData = {
+    partnerType: 'driver' | 'restaurant';
+    fullName: string;
+    email: string;
+    phone: string;
+    password: string;
+    confirmPassword: string;
+    vehicleModel?: string;
+    licensePlate?: string;
+    vehicleType?: string;
+    restaurantName?: string;
+    restaurantAddress?: string;
+    cuisineType?: string;
+    agreedToTerms: boolean;
+};

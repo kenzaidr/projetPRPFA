@@ -1,9 +1,9 @@
 import type { Language, TranslationConfig } from '../types';
 
 export const languageConfig: Record<Language, TranslationConfig> = {
-    ar: { lang: 'ar', dir: 'rtl' },
-    fr: { lang: 'fr', dir: 'ltr' },
-    en: { lang: 'en', dir: 'ltr' }
+    ar: { lang: 'ar', dir: 'rtl', label: 'العربية' },
+    fr: { lang: 'fr', dir: 'ltr', label: 'Français' },
+    en: { lang: 'en', dir: 'ltr', label: 'English' }
 };
 
 const translationsDict: Record<string, Record<Language, string>> = {
@@ -13,6 +13,68 @@ const translationsDict: Record<string, Record<Language, string>> = {
     'nav.partner': { ar: 'كن شريكاً', fr: 'Devenir partenaire', en: 'Become a Partner' },
     'nav.login': { ar: 'تسجيل الدخول', fr: 'Connexion', en: 'Login' },
     'nav.downloadApp': { ar: 'حمل التطبيق', fr: 'Télécharger', en: 'Download App' },
+    'nav.backToHome': { ar: 'العودة إلى الصفحة الرئيسية', fr: 'Retour à l\'accueil', en: 'Back to Home' },
+    
+    // Auth General (Partner)
+    'auth.login.title': { ar: 'تسجيل دخول الشركاء', fr: 'Connexion Partenaire', en: 'Partner Login' },
+    'auth.login.subtitle': { ar: 'إدارة أعمالك أو رحلاتك', fr: 'Gérez votre activité ou vos courses', en: 'Manage your business or drives' },
+    'auth.login.email': { ar: 'البريد الإلكتروني أو الهاتف', fr: 'Email ou Téléphone', en: 'Email or Phone' },
+    'auth.login.emailPlaceholder': { ar: 'name@example.com', fr: 'nom@exemple.com', en: 'name@example.com' },
+    'auth.login.password': { ar: 'كلمة المرور', fr: 'Mot de passe', en: 'Password' },
+    'auth.login.passwordPlaceholder': { ar: 'أدخل كلمة المرور', fr: 'Entrez votre mot de passe', en: 'Enter your password' },
+    'auth.login.forgotPassword': { ar: 'نسيت كلمة المرور؟', fr: 'Mot de passe oublié ?', en: 'Forgot Password?' },
+    'auth.login.submit': { ar: 'دخول كشريك', fr: 'Se connecter', en: 'Login as Partner' },
+    'auth.login.noAccount': { ar: 'ليس لديك حساب؟', fr: 'Pas de compte ?', en: 'Don\'t have an account?' },
+    'auth.login.signupLink': { ar: 'انضم كشريك', fr: 'Devenir Partenaire', en: 'Join as Partner' },
+    'auth.error.invalidCredentials': { ar: 'البريد الإلكتروني أو كلمة المرور غير صحيحة', fr: 'Email ou mot de passe incorrect', en: 'Invalid email or password' },
+
+    // Signup General
+    'auth.signup.title': { ar: 'انضم كشريك', fr: 'Devenir Partenaire', en: 'Join as a Partner' },
+    'auth.signup.subtitle': { ar: 'نمِّ أعمالك مع غراب المغرب', fr: 'Développez votre activité avec Grab Morocco', en: 'Grow your business with Grab Morocco' },
+    
+    // Partner Type Selection
+    'auth.signup.selectType': { ar: 'أريد التسجيل كـ...', fr: 'Je veux m\'inscrire en tant que...', en: 'I want to register as a...' },
+    'auth.signup.type.driver': { ar: 'سائق', fr: 'Chauffeur', en: 'Driver' },
+    'auth.signup.type.driverDesc': { ar: 'اربح من خلال توصيل الركاب أو الطلبات', fr: 'Gagnez en conduisant ou en livrant', en: 'Earn by driving passengers or deliveries' },
+    'auth.signup.type.restaurant': { ar: 'مطعم', fr: 'Restaurant', en: 'Restaurant' },
+    'auth.signup.type.restaurantDesc': { ar: 'نمِّ مطعمك معنا', fr: 'Développez votre restaurant avec nous', en: 'Grow your food business with us' },
+    
+    'auth.signup.section.personal': { ar: 'المعلومات الشخصية', fr: 'Informations Personnelles', en: 'Personal Information' },
+    'auth.signup.section.business': { ar: 'معلومات العمل', fr: 'Informations Commerciales', en: 'Business Information' },
+    'auth.signup.section.vehicle': { ar: 'معلومات المركبة', fr: 'Informations du Véhicule', en: 'Vehicle Information' },
+    
+    // Signup Fields
+    'auth.signup.fullName': { ar: 'الاسم الكامل', fr: 'Nom Complet', en: 'Full Name' },
+    'auth.signup.fullNamePlaceholder': { ar: 'الاسم الكامل', fr: 'Jean Dupont', en: 'John Doe' },
+    'auth.signup.phone': { ar: 'رقم الهاتف', fr: 'Numéro de téléphone', en: 'Phone Number' },
+    'auth.signup.phonePlaceholder': { ar: '+212 6XX-XXXXXX', fr: '+212 6XX-XXXXXX', en: '+212 6XX-XXXXXX' },
+    'auth.signup.confirmPassword': { ar: 'تأكيد كلمة المرور', fr: 'Confirmer le mot de passe', en: 'Confirm Password' },
+    
+    // Vehicle Fields
+    'auth.signup.vehicleModel': { ar: 'موديل المركبة', fr: 'Modèle du véhicule', en: 'Vehicle Model' },
+    'auth.signup.licensePlate': { ar: 'لوحة الترخيص', fr: 'Immatriculation', en: 'License Plate' },
+    'auth.signup.vehicleType': { ar: 'نوع المركبة', fr: 'Type de véhicule', en: 'Vehicle Type' },
+    'auth.signup.type.car': { ar: 'سيارة', fr: 'Voiture', en: 'Car' },
+    'auth.signup.type.motorcycle': { ar: 'دراجة نارية', fr: 'Moto', en: 'Motorcycle' },
+    
+    // Restaurant Fields
+    'auth.signup.restaurantName': { ar: 'اسم المطعم', fr: 'Nom du Restaurant', en: 'Restaurant Name' },
+    'auth.signup.restaurantAddress': { ar: 'العنوان', fr: 'Adresse', en: 'Address' },
+    'auth.signup.cuisineType': { ar: 'نوع المطبخ', fr: 'Type de Cuisine', en: 'Cuisine Type' },
+
+    'auth.signup.terms': { ar: 'أوافق على الشروط والأحكام', fr: 'J\'accepte les conditions générales', en: 'I agree to the Terms & Conditions' },
+    'auth.signup.submit': { ar: 'إنشاء حساب شريك', fr: 'Créer un compte partenaire', en: 'Create Partner Account' },
+    'auth.signup.hasAccount': { ar: 'هل أنت شريك بالفعل؟', fr: 'Déjà partenaire ?', en: 'Already a partner?' },
+    'auth.signup.loginLink': { ar: 'سجل الدخول هنا', fr: 'Connexion', en: 'Login Here' },
+
+    // Errors & Strength
+    'auth.password.strength.weak': { ar: 'ضعيف', fr: 'Faible', en: 'Weak' },
+    'auth.password.strength.medium': { ar: 'متوسط', fr: 'Moyen', en: 'Medium' },
+    'auth.password.strength.strong': { ar: 'قوي', fr: 'Fort', en: 'Strong' },
+    'auth.error.required': { ar: 'هذا الحقل مطلوب', fr: 'Ce champ est requis', en: 'This field is required' },
+    'auth.error.email': { ar: 'بريد إلكتروني غير صالح', fr: 'Adresse email invalide', en: 'Invalid email address' },
+    'auth.error.match': { ar: 'كلمات المرور غير متطابقة', fr: 'Les mots de passe ne correspondent pas', en: 'Passwords do not match' },
+    'auth.error.terms': { ar: 'يجب أن توافق على الشروط', fr: 'Vous devez accepter les conditions', en: 'You must agree to the terms' },
     'hero.badge': { ar: 'التطبيق رقم #1 في المغرب', fr: 'Application #1 au Maroc', en: '#1 App in Morocco' },
     'hero.title1': { ar: 'تحرك بحرية', fr: 'Déplacez-vous librement', en: 'Move Freely' },
     'hero.title2': { ar: 'في كل أنحاء المغرب', fr: 'partout au Maroc', en: 'Across Morocco' },
@@ -76,18 +138,36 @@ const translationsDict: Record<string, Record<Language, string>> = {
     'footer.copyright': { ar: '© 2024 Grab Morocco. جميع الحقوق محفوظة.', fr: '© 2024 Grab Morocco. Tous droits réservés.', en: '© 2024 Grab Morocco. All rights reserved.' },
 };
 
-let currentLanguage: Language = 'en';
+const STORAGE_KEY = 'grab_morocco_lang';
 
-export function getTranslation(key: string, lang: Language = currentLanguage): string {
-    return translationsDict[key]?.[lang] || key;
+export function getCurrentLanguage(): Language {
+    try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored && (stored === 'en' || stored === 'fr' || stored === 'ar')) {
+                return stored as Language;
+            }
+        }
+    } catch (e) {
+        console.warn('Error accessing localStorage:', e);
+    }
+    return 'en';
 }
 
 export function setLanguage(lang: Language) {
-    currentLanguage = lang;
+    try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem(STORAGE_KEY, lang);
+            window.dispatchEvent(new Event('language-change'));
+        }
+    } catch (e) {
+        console.warn('Error setting language in localStorage:', e);
+    }
 }
 
-export function getCurrentLanguage(): Language {
-    return currentLanguage;
+export function getTranslation(key: string, lang?: Language): string {
+    const currentLang = lang || getCurrentLanguage();
+    return translationsDict[key]?.[currentLang] || key;
 }
 
 export type { Language };

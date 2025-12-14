@@ -84,6 +84,20 @@ html {
     animation: gradient-shift 3s ease infinite;
 }
 
+/* Shimmer Animation for Buttons */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.animate-shimmer {
+    animation: shimmer 2s linear infinite;
+}
+
 /* Card Hover Effects */
 .hover-lift {
     transition: all 0.3s ease;
