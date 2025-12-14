@@ -1,17 +1,20 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Home from './features/home/home'
-import Ride from './features/ride/ride'
-import './App.css'
+import React from 'react';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import DriverDashboard from './features/driver/DriverDashboard.tsx';
+import Ride from './features/ride/ride.jsx';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/driver" element={<DriverDashboard />} />
         <Route path="/ride" element={<Ride />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
-  )
-}
+    </HashRouter>
+  );
+};
 
-export default App
+export default App;

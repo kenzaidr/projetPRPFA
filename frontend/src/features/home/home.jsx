@@ -43,14 +43,16 @@ const Home = () => {
     }
 
     // Charger les scripts de traduction
-    loadScript('/src/main/resources/static/js/translations.js')
-      .then(() => loadScript('/src/main/resources/static/js/main.js'))
-      .catch(err => console.error('Error loading scripts:', err));
+    // Note: Les fichiers doivent être dans public/ pour être accessibles
+    // loadScript('/js/translations.js')
+    //   .then(() => loadScript('/js/main.js'))
+    //   .catch(err => console.error('Error loading scripts:', err));
 
     // Appliquer les styles
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = '/src/main/resources/static/css/styles.css';
+    // Note: Les fichiers CSS doivent être dans public/ ou importés directement
+    // const link = document.createElement('link');
+    // link.rel = 'stylesheet';
+    // link.href = '/css/styles.css';
     if (!document.querySelector(`link[href="${link.href}"]`)) {
       document.head.appendChild(link);
     }
@@ -194,7 +196,8 @@ const Home = () => {
               <div className="absolute -bottom-6 -right-6 bg-white rounded-2xl shadow-xl p-6 animate-float z-20">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-morocco-green/10 rounded-full flex items-center justify-center">
-                    <img src="/src/main/resources/static/images/icons/car.svg" alt="Car" className="w-6 h-6" style={{filter: 'invert(27%) sepia(51%) saturate(2878%) hue-rotate(146deg) brightness(104%) contrast(101%)'}} />
+                    {/* Note: Les images doivent être dans public/images/icons/ pour être accessibles */}
+                    <div className="w-6 h-6 bg-morocco-green rounded"></div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-600" data-i18n="hero.nextRide">رحلتك القادمة</div>
@@ -206,7 +209,8 @@ const Home = () => {
               <div className="absolute -top-6 -left-6 bg-white rounded-2xl shadow-xl p-6 animate-float-delayed z-20">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-morocco-red/10 rounded-full flex items-center justify-center">
-                    <img src="/src/main/resources/static/images/icons/restaurant.svg" alt="Food" className="w-6 h-6" style={{filter: 'invert(19%) sepia(91%) saturate(3207%) hue-rotate(347deg) brightness(91%) contrast(95%)'}} />
+                    {/* Note: Les images doivent être dans public/images/icons/ pour être accessibles */}
+                    <div className="w-6 h-6 bg-morocco-red rounded"></div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-600" data-i18n="hero.foodDelivery">توصيل الطعام</div>
@@ -236,7 +240,8 @@ const Home = () => {
               
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-gradient-to-br from-morocco-red to-morocco-red/70 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <img src="/src/main/resources/static/images/icons/car.svg" alt="Car" className="w-8 h-8" style={{filter: 'brightness(0) invert(1)'}} />
+                  {/* Note: Les images doivent être dans public/images/icons/ pour être accessibles */}
+                  <div className="w-8 h-8 bg-white/20 rounded"></div>
                 </div>
                 
                 <h3 className="text-2xl font-bold mb-3 text-right" data-i18n="services.ride.title">خدمة التوصيل</h3>
@@ -261,7 +266,8 @@ const Home = () => {
               
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-gradient-to-br from-morocco-green to-morocco-green/70 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <img src="/src/main/resources/static/images/icons/restaurant.svg" alt="Food" className="w-8 h-8" style={{filter: 'brightness(0) invert(1)'}} />
+                  {/* Note: Les images doivent être dans public/images/icons/ pour être accessibles */}
+                  <div className="w-8 h-8 bg-white/20 rounded"></div>
                 </div>
                 
                 <h3 className="text-2xl font-bold mb-3 text-right" data-i18n="services.food.title">توصيل الطعام</h3>
@@ -286,7 +292,8 @@ const Home = () => {
               
               <div className="relative z-10">
                 <div className="w-16 h-16 bg-gradient-to-br from-morocco-gold to-morocco-gold/70 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <img src="/src/main/resources/static/images/icons/package.svg" alt="Package" className="w-8 h-8" style={{filter: 'brightness(0) invert(1)'}} />
+                  {/* Note: Les images doivent être dans public/images/icons/ pour être accessibles */}
+                  <div className="w-8 h-8 bg-white/20 rounded"></div>
                 </div>
                 
                 <h3 className="text-2xl font-bold mb-3 text-right" data-i18n="services.package.title">توصيل الطرود</h3>
@@ -368,7 +375,8 @@ const Home = () => {
             {/* Safety */}
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow text-right">
               <div className="w-14 h-14 bg-morocco-red/10 rounded-xl flex items-center justify-center mb-4 mr-auto">
-                <img src="/src/main/resources/static/images/icons/shield.svg" alt="Safety" className="w-7 h-7" style={{filter: 'invert(19%) sepia(91%) saturate(3207%) hue-rotate(347deg) brightness(91%) contrast(95%)'}} />
+                {/* Note: Les images doivent être dans public/images/icons/ pour être accessibles */}
+                <div className="w-7 h-7 bg-morocco-red/20 rounded"></div>
               </div>
               <h3 className="text-xl font-bold mb-2" data-i18n="features.safety.title">أمان مضمون</h3>
               <p className="text-gray-600" data-i18n="features.safety.description">سائقون موثوقون ومراقبة على مدار الساعة</p>
@@ -377,7 +385,8 @@ const Home = () => {
             {/* Payment */}
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow text-right">
               <div className="w-14 h-14 bg-morocco-green/10 rounded-xl flex items-center justify-center mb-4 mr-auto">
-                <img src="/src/main/resources/static/images/icons/wallet.svg" alt="Payment" className="w-7 h-7" style={{filter: 'invert(27%) sepia(51%) saturate(2878%) hue-rotate(146deg) brightness(104%) contrast(101%)'}} />
+                {/* Note: Les images doivent être dans public/images/icons/ pour être accessibles */}
+                <div className="w-7 h-7 bg-morocco-green/20 rounded"></div>
               </div>
               <h3 className="text-xl font-bold mb-2" data-i18n="features.payment.title">دفع مرن</h3>
               <p className="text-gray-600" data-i18n="features.payment.description">نقداً أو بطاقة أو محفظة إلكترونية</p>
@@ -386,7 +395,8 @@ const Home = () => {
             {/* Tracking */}
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow text-right">
               <div className="w-14 h-14 bg-morocco-gold/10 rounded-xl flex items-center justify-center mb-4 mr-auto">
-                <img src="/src/main/resources/static/images/icons/navigation.svg" alt="Tracking" className="w-7 h-7" style={{filter: 'invert(73%) sepia(55%) saturate(466%) hue-rotate(8deg) brightness(92%) contrast(88%)'}} />
+                {/* Note: Les images doivent être dans public/images/icons/ pour être accessibles */}
+                <div className="w-7 h-7 bg-morocco-gold/20 rounded"></div>
               </div>
               <h3 className="text-xl font-bold mb-2" data-i18n="features.tracking.title">تتبع فوري</h3>
               <p className="text-gray-600" data-i18n="features.tracking.description">راقب موقع طلبك لحظة بلحظة</p>
@@ -395,7 +405,8 @@ const Home = () => {
             {/* Fast */}
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow text-right">
               <div className="w-14 h-14 bg-morocco-red/10 rounded-xl flex items-center justify-center mb-4 mr-auto">
-                <img src="/src/main/resources/static/images/icons/clock.svg" alt="Fast" className="w-7 h-7" style={{filter: 'invert(19%) sepia(91%) saturate(3207%) hue-rotate(347deg) brightness(91%) contrast(95%)'}} />
+                {/* Note: Les images doivent être dans public/images/icons/ pour être accessibles */}
+                <div className="w-7 h-7 bg-morocco-red/20 rounded"></div>
               </div>
               <h3 className="text-xl font-bold mb-2" data-i18n="features.fast.title">سرعة فائقة</h3>
               <p className="text-gray-600" data-i18n="features.fast.description">وصول سريع في أقل من 5 دقائق</p>
@@ -513,3 +524,5 @@ const Home = () => {
 };
 
 export default Home;
+
+
