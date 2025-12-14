@@ -492,3 +492,13 @@
     font-size: 1.25rem;
   }
 }
+
+/* Animation pour le spinner de chargement */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

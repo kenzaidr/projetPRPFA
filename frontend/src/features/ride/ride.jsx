@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './ride.css';
 
@@ -32,10 +32,14 @@ const RideBooking = () => {
   const [currentAddress, setCurrentAddress] = useState('');
   const [stops, setStops] = useState([]); // Array of { id, address, lat, lng }
   const [selectingLocation, setSelectingLocation] = useState(null); // 'pickup', 'destination', or stop id
+  const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
+  const [routeError, setRouteError] = useState(null);
   const profileMenuRef = useRef(null);
   const profileButtonRef = useRef(null);
   const pickupInputRef = useRef(null);
   const pickupDropdownRef = useRef(null);
+  const routeCalculationTimeoutRef = useRef(null);
+  const isCalculatingRef = useRef(false);
   
   // Refs for map markers
   const pickupMarkerRef = useRef(null);
@@ -43,6 +47,7 @@ const RideBooking = () => {
   const stopsMarkersRef = useRef([]);
   const pickupCoordsRef = useRef(null);
   const destinationCoordsRef = useRef(null);
+  const routePolylineRef = useRef(null);
 
   // Obtenir la position actuelle de l'utilisateur
   useEffect(() => {
@@ -163,8 +168,21 @@ const RideBooking = () => {
     return () => {
       isMounted = false;
       if (mapInstanceRef.current) {
+        // Nettoyer la route si elle existe
+        if (routePolylineRef.current) {
+          try {
+            mapInstanceRef.current.removeLayer(routePolylineRef.current);
+          } catch (error) {
+            // Ignorer les erreurs si la couche n'existe plus
+          }
+          routePolylineRef.current = null;
+        }
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
+      }
+      // Nettoyer les timeouts
+      if (routeCalculationTimeoutRef.current) {
+        clearTimeout(routeCalculationTimeoutRef.current);
       }
     };
   }, []);
@@ -273,6 +291,212 @@ const RideBooking = () => {
     }
   };
 
+  // Fonction pour géocoder une adresse en coordonnées
+  const geocode = async (address) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
+      );
+      const data = await response.json();
+      if (data && data.length > 0) {
+        return {
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon)
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Erreur lors du géocodage:', error);
+      return null;
+    }
+  };
+
+  // Fonction pour nettoyer la route existante
+  const clearRoute = useCallback(() => {
+    if (routePolylineRef.current && mapInstanceRef.current) {
+      try {
+        mapInstanceRef.current.removeLayer(routePolylineRef.current);
+      } catch (error) {
+        // Ignorer les erreurs si la couche n'existe plus
+      }
+      routePolylineRef.current = null;
+    }
+    setRouteError(null);
+  }, []);
+
+  // Fonction pour calculer et dessiner la route avec gestion améliorée
+  const drawRoute = useCallback(async (force = false) => {
+    // Éviter les appels multiples simultanés
+    if (isCalculatingRef.current && !force) {
+      return;
+    }
+
+    if (!mapInstanceRef.current || !window.L) return;
+
+    // Nettoyer l'ancienne route
+    clearRoute();
+
+    // Construire la liste des points (pickup + arrêts + destination)
+    const waypoints = [];
+    
+    try {
+      // Ajouter le point de départ
+      if (pickupCoordsRef.current) {
+        waypoints.push(pickupCoordsRef.current);
+      } else if (pickup && pickup.trim()) {
+        // Si on a l'adresse mais pas les coordonnées, géocoder
+        setIsCalculatingRoute(true);
+        const coords = await geocode(pickup);
+        if (coords) {
+          pickupCoordsRef.current = coords;
+          waypoints.push(coords);
+        } else {
+          setRouteError('Impossible de trouver le lieu de prise en charge');
+          setIsCalculatingRoute(false);
+          return;
+        }
+      }
+
+      // Ajouter les arrêts valides
+      const validStops = stops.filter(stop => stop.lat && stop.lng && 
+        typeof stop.lat === 'number' && typeof stop.lng === 'number' &&
+        !isNaN(stop.lat) && !isNaN(stop.lng));
+      
+      validStops.forEach(stop => {
+        waypoints.push({ lat: stop.lat, lng: stop.lng });
+      });
+
+      // Ajouter la destination (optionnelle)
+      if (destinationCoordsRef.current) {
+        waypoints.push(destinationCoordsRef.current);
+      } else if (destination && destination.trim()) {
+        // Si on a l'adresse mais pas les coordonnées, géocoder
+        const coords = await geocode(destination);
+        if (coords) {
+          destinationCoordsRef.current = coords;
+          waypoints.push(coords);
+        } else {
+          // Ne pas bloquer si la destination n'est pas trouvée, juste ne pas l'ajouter
+          console.warn('Impossible de trouver la destination, continuation sans destination');
+        }
+      }
+
+      // Si on a moins de 2 points, on ne peut pas dessiner de route
+      // Mais on peut avoir juste le pickup si l'utilisateur n'a pas encore saisi de destination
+      if (waypoints.length < 1) {
+        setIsCalculatingRoute(false);
+        return;
+      }
+      
+      // Si on n'a qu'un seul point (juste le pickup), on ne dessine pas de route mais on affiche le marqueur
+      if (waypoints.length < 2) {
+        setIsCalculatingRoute(false);
+        // Nettoyer la route existante car on n'a pas assez de points
+        clearRoute();
+        return;
+      }
+
+      // Vérifier que tous les waypoints ont des coordonnées valides
+      const invalidWaypoint = waypoints.find(wp => 
+        !wp || typeof wp.lat !== 'number' || typeof wp.lng !== 'number' ||
+        isNaN(wp.lat) || isNaN(wp.lng) ||
+        wp.lat < -90 || wp.lat > 90 || wp.lng < -180 || wp.lng > 180
+      );
+
+      if (invalidWaypoint) {
+        setRouteError('Coordonnées invalides pour un des points');
+        setIsCalculatingRoute(false);
+        return;
+      }
+
+      isCalculatingRef.current = true;
+      setIsCalculatingRoute(true);
+      setRouteError(null);
+
+      // Construire l'URL pour OSRM
+      const coordinates = waypoints.map(wp => `${wp.lng},${wp.lat}`).join(';');
+      const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=geojson&alternatives=false`;
+
+      // Créer un AbortController pour gérer le timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // Timeout de 10 secondes
+
+      const response = await fetch(url, {
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+        const route = data.routes[0];
+        
+        if (!route.geometry || !route.geometry.coordinates || route.geometry.coordinates.length === 0) {
+          throw new Error('Route invalide retournée par le service');
+        }
+
+        const routeCoordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]); // OSRM retourne [lng, lat], Leaflet attend [lat, lng]
+
+        // Vérifier que la carte existe toujours avant d'ajouter la route
+        if (!mapInstanceRef.current) {
+          return;
+        }
+
+        // Créer la polyline pour la route avec un style amélioré
+        routePolylineRef.current = window.L.polyline(routeCoordinates, {
+          color: '#000000',
+          weight: 6,
+          opacity: 0.9,
+          lineJoin: 'round',
+          lineCap: 'round',
+          smoothFactor: 1.0
+        }).addTo(mapInstanceRef.current);
+
+        // Ajouter un popup avec les informations de la route
+        const distance = route.distance ? (route.distance / 1000).toFixed(1) : 'N/A';
+        const duration = route.duration ? Math.round(route.duration / 60) : 'N/A';
+        routePolylineRef.current.bindPopup(`
+          <div style="text-align: center; padding: 5px;">
+            <strong>Distance:</strong> ${distance} km<br>
+            <strong>Durée estimée:</strong> ${duration} min
+          </div>
+        `);
+
+        // Ajuster la vue pour afficher toute la route avec animation
+        if (waypoints.length > 0) {
+          const bounds = waypoints.map(wp => [wp.lat, wp.lng]);
+          mapInstanceRef.current.fitBounds(bounds, { 
+            padding: [80, 80],
+            maxZoom: 15
+          });
+        }
+
+        setRouteError(null);
+      } else if (data.code === 'NoRoute') {
+        setRouteError('Aucun itinéraire trouvé entre les points sélectionnés');
+      } else {
+        setRouteError('Impossible de calculer l\'itinéraire');
+      }
+    } catch (error) {
+      console.error('Erreur lors du calcul de la route:', error);
+      if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+        setRouteError('Le calcul de l\'itinéraire a pris trop de temps');
+      } else if (error.message) {
+        setRouteError(error.message);
+      } else {
+        setRouteError('Erreur lors du calcul de l\'itinéraire');
+      }
+    } finally {
+      isCalculatingRef.current = false;
+      setIsCalculatingRoute(false);
+    }
+  }, [pickup, destination, stops, clearRoute]);
+
   // Gérer le clic sur la carte pour sélectionner un emplacement
   useEffect(() => {
     if (!mapInstanceRef.current || !window.L) return;
@@ -290,6 +514,13 @@ const RideBooking = () => {
         if (mapInstanceRef.current) {
           mapInstanceRef.current.getContainer().style.cursor = '';
         }
+        // Recalculer la route après la mise à jour avec debounce
+        if (routeCalculationTimeoutRef.current) {
+          clearTimeout(routeCalculationTimeoutRef.current);
+        }
+        routeCalculationTimeoutRef.current = setTimeout(() => {
+          drawRoute(true);
+        }, 300);
       } else if (selectingLocation === 'destination') {
         setDestination(address);
         destinationCoordsRef.current = { lat, lng };
@@ -297,6 +528,13 @@ const RideBooking = () => {
         if (mapInstanceRef.current) {
           mapInstanceRef.current.getContainer().style.cursor = '';
         }
+        // Recalculer la route après la mise à jour avec debounce
+        if (routeCalculationTimeoutRef.current) {
+          clearTimeout(routeCalculationTimeoutRef.current);
+        }
+        routeCalculationTimeoutRef.current = setTimeout(() => {
+          drawRoute(true);
+        }, 300);
       } else {
         // C'est un arrêt
         const stopId = selectingLocation;
@@ -311,6 +549,13 @@ const RideBooking = () => {
         if (mapInstanceRef.current) {
           mapInstanceRef.current.getContainer().style.cursor = '';
         }
+        // Recalculer la route après la mise à jour avec debounce
+        if (routeCalculationTimeoutRef.current) {
+          clearTimeout(routeCalculationTimeoutRef.current);
+        }
+        routeCalculationTimeoutRef.current = setTimeout(() => {
+          drawRoute(true);
+        }, 300);
       }
     };
 
@@ -328,7 +573,7 @@ const RideBooking = () => {
         }
       }
     };
-  }, [selectingLocation]);
+  }, [selectingLocation, drawRoute]);
 
   // Mettre à jour les marqueurs sur la carte
   useEffect(() => {
@@ -450,19 +695,29 @@ const RideBooking = () => {
       }
     });
 
-    // Ajuster la vue pour afficher tous les marqueurs
-    if (pickupCoordsRef.current || destinationCoordsRef.current || stops.length > 0) {
-      const bounds = [];
-      if (pickupCoordsRef.current) bounds.push([pickupCoordsRef.current.lat, pickupCoordsRef.current.lng]);
-      if (destinationCoordsRef.current) bounds.push([destinationCoordsRef.current.lat, destinationCoordsRef.current.lng]);
-      stops.forEach(stop => {
-        if (stop.lat && stop.lng) bounds.push([stop.lat, stop.lng]);
-      });
-      if (bounds.length > 0) {
-        mapInstanceRef.current.fitBounds(bounds, { padding: [50, 50] });
+    // Dessiner la route si on a au moins le pickup (destination est optionnelle)
+    // On peut dessiner une route avec juste pickup + arrêts, ou pickup + destination, ou pickup + arrêts + destination
+    if (pickupCoordsRef.current || pickup) {
+      // Annuler le timeout précédent s'il existe
+      if (routeCalculationTimeoutRef.current) {
+        clearTimeout(routeCalculationTimeoutRef.current);
       }
+      // Attendre un peu avant de recalculer pour éviter trop d'appels
+      routeCalculationTimeoutRef.current = setTimeout(() => {
+        drawRoute();
+      }, 500);
+    } else {
+      // Si on n'a plus de point de départ, nettoyer la route
+      clearRoute();
     }
-  }, [pickup, destination, stops]);
+
+    // Nettoyer le timeout lors du démontage
+    return () => {
+      if (routeCalculationTimeoutRef.current) {
+        clearTimeout(routeCalculationTimeoutRef.current);
+      }
+    };
+  }, [pickup, destination, stops, drawRoute, clearRoute]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -807,6 +1062,9 @@ const RideBooking = () => {
                         className="pickup-option pickup-option-current"
                         onClick={() => {
                           setPickup(currentAddress);
+                          if (currentLocation) {
+                            pickupCoordsRef.current = { lat: currentLocation.lat, lng: currentLocation.lng };
+                          }
                           setShowPickupDropdown(false);
                         }}
                       >
@@ -869,7 +1127,6 @@ const RideBooking = () => {
                       mapInstanceRef.current.getContainer().style.cursor = 'crosshair';
                     }
                   }}
-                  required
                 />
                 <button 
                   type="button" 
@@ -1089,6 +1346,68 @@ const RideBooking = () => {
               {selectingLocation === 'pickup' && 'Cliquez sur la carte pour sélectionner le lieu de prise en charge'}
               {selectingLocation === 'destination' && 'Cliquez sur la carte pour sélectionner la destination'}
               {selectingLocation !== 'pickup' && selectingLocation !== 'destination' && 'Cliquez sur la carte pour sélectionner l\'arrêt'}
+            </div>
+          )}
+          
+          {/* Indicateur de chargement de la route */}
+          {isCalculatingRoute && (
+            <div style={{
+              position: 'absolute',
+              top: '20px',
+              right: '20px',
+              backgroundColor: '#ffffff',
+              color: '#000000',
+              padding: '12px 20px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              zIndex: 1000,
+              fontSize: '14px',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <div style={{
+                width: '16px',
+                height: '16px',
+                border: '2px solid #006233',
+                borderTop: '2px solid transparent',
+                borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite'
+              }}></div>
+              Calcul de l'itinéraire...
+            </div>
+          )}
+
+          {/* Message d'erreur de la route */}
+          {routeError && !isCalculatingRoute && (
+            <div style={{
+              position: 'absolute',
+              top: '20px',
+              right: '20px',
+              backgroundColor: '#C1272D',
+              color: '#ffffff',
+              padding: '12px 20px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+              zIndex: 1000,
+              fontSize: '14px',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              maxWidth: '300px',
+              cursor: 'pointer'
+            }}
+            onClick={() => setRouteError(null)}
+            >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: '18px', height: '18px', flexShrink: 0 }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{routeError}</span>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: '16px', height: '16px', flexShrink: 0, marginLeft: 'auto' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </div>
           )}
         </div>
