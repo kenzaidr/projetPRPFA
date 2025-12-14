@@ -2,7 +2,7 @@ import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import DriverDashboard from './features/driver/DriverDashboard.tsx';
-import Ride from './features/ride/ride.jsx';
+import Ride from './features/driver/driveCustumor.jsx';
 
 const App: React.FC = () => {
   return (
