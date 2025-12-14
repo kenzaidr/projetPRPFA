@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaFacebookF, FaGoogle } from "react-icons/fa";
 
-interface LoginResponse {
+interface SignupResponse {
   token?: string;
   message?: string;
 }
 
-const Login: React.FC = () => {
+const Signup: React.FC = () => {
   const navigate = useNavigate();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
-  // 📱 Responsive
+  // 🎯 Media screen logic
   useEffect(() => {
     const media = window.matchMedia("(max-width: 768px)");
     setIsMobile(media.matches);
@@ -29,23 +29,28 @@ const Login: React.FC = () => {
     return () => media.removeEventListener("change", listener);
   }, []);
 
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setMessage("Les mots de passe ne correspondent pas");
+      return;
+    }
 
     setIsLoading(true);
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
+      const res = await fetch("http://localhost:8080/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
-      const data: LoginResponse = await res.json();
+      const data: SignupResponse = await res.json();
 
       if (!res.ok) {
-        setMessage(data.message || "Erreur de connexion");
+        setMessage(data.message || "Erreur d'inscription");
         setIsLoading(false);
         return;
       }
@@ -54,7 +59,7 @@ const Login: React.FC = () => {
         localStorage.setItem("token", data.token);
       }
 
-      setMessage("Connexion réussie ! Redirection...");
+      setMessage("Inscription réussie ! Redirection...");
       
       // Redirection après succès
       setTimeout(() => {
@@ -88,15 +93,27 @@ const Login: React.FC = () => {
             {isMobile && (
               <h1 style={styles.mobileLogo}>MMKH</h1>
             )}
-            <h1 style={styles.Logo}>MMKH</h1>
+
             <div style={styles.formHeader}>
-              <h2 style={styles.formTitle}>Connexion</h2>
+              <h2 style={styles.formTitle}>Créer un compte</h2>
               <p style={styles.formSubtitle}>
-                Accédez à votre compte MMKH
+                Commencez votre expérience de livraison
               </p>
             </div>
 
-            <form onSubmit={handleLogin} style={styles.form}>
+            <form onSubmit={handleSignup} style={styles.form}>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Nom complet</label>
+                <input
+                  type="text"
+                  placeholder="Mohamed Alami"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  style={styles.input}
+                />
+              </div>
+
               <div style={styles.inputGroup}>
                 <label style={styles.label}>Adresse email</label>
                 <input
@@ -110,32 +127,28 @@ const Login: React.FC = () => {
               </div>
 
               <div style={styles.inputGroup}>
-                <div style={styles.labelRow}>
-                  <label style={styles.label}>Mot de passe</label>
-                  
-                </div>
+                <label style={styles.label}>Mot de passe</label>
                 <input
                   type="password"
-                  placeholder="Entrez votre mot de passe"
+                  placeholder="Minimum 8 caractères"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  minLength={8}
                   style={styles.input}
                 />
-                <span style={styles.forgotLink}>Mot de passe oublié ?</span>
               </div>
 
-              <div style={styles.checkboxGroup}>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>Confirmer le mot de passe</label>
                 <input
-                  type="checkbox"
-                  id="rememberMe"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  style={styles.checkbox}
+                  type="password"
+                  placeholder="Retapez votre mot de passe"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  style={styles.input}
                 />
-                <label htmlFor="rememberMe" style={styles.checkboxLabel}>
-                  Se souvenir de moi
-                </label>
               </div>
 
               <button
@@ -147,7 +160,7 @@ const Login: React.FC = () => {
                   cursor: isLoading ? "not-allowed" : "pointer",
                 }}
               >
-                {isLoading ? "Connexion en cours..." : "Se connecter"}
+                {isLoading ? "Inscription en cours..." : "Créer mon compte"}
               </button>
             </form>
 
@@ -166,30 +179,17 @@ const Login: React.FC = () => {
             )}
 
             <div style={styles.divider}>
-              <span style={styles.dividerLine}></span>
               <span style={styles.dividerText}>ou</span>
-              <span style={styles.dividerLine}></span>
-            </div>
-
-            <div style={styles.socialButtons}>
-              <button style={styles.socialButton}>
-                <FaFacebookF style={styles.socialIcon} color="#1877F2" size={20} />
-                Facebook
-              </button>
-              <button style={styles.socialButton}>
-                <FaGoogle style={styles.socialIcon} color="#DB4437" size={20} />
-                Google
-              </button>
             </div>
 
             <div style={styles.footer}>
               <p style={styles.footerText}>
-                Vous n'avez pas de compte ?{" "}
+                Vous avez déjà un compte ?{" "}
                 <span
-                  onClick={() => navigate("/signup")}
+                  onClick={() => navigate("/login")}
                   style={styles.footerLink}
                 >
-                  Créer un compte
+                  Se connecter
                 </span>
               </p>
             </div>
@@ -202,20 +202,20 @@ const Login: React.FC = () => {
 
 const styles: { [key: string]: React.CSSProperties } = {
   page: {
-    minHeight: "110vh",
+    minHeight: "100vh",
     backgroundColor: "#f5f5f5",
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
   },
 
   container: {
     display: "flex",
-    minHeight: "110vh",
+    minHeight: "100vh",
   },
 
   /* ===== LEFT SIDE - BRANDING ===== */
   leftSide: {
     flex: 1,
-    background: "linear-gradient(135deg, #C1272D 0%, #8B1E24 100%)",
+    background: "linear-gradient(135deg, #006233 0%, #00843d 100%)",
     color: "#FFFFFF",
     padding: "60px",
     display: "flex",
@@ -293,9 +293,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     left: "30px",
     padding: "10px 20px",
     borderRadius: "25px",
-    border: "2px solid #C1272D",
+    border: "2px solid #006233",
     backgroundColor: "transparent",
-    color: "#C1272D",
+    color: "#006233",
     fontSize: "15px",
     fontWeight: "600",
     cursor: "pointer",
@@ -305,8 +305,6 @@ const styles: { [key: string]: React.CSSProperties } = {
   formContainer: {
     width: "100%",
     maxWidth: "450px",
-    position: "absolute",
-    top: "0",
   },
 
   mobileLogo: {
@@ -318,19 +316,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     WebkitTextFillColor: "transparent",
     textAlign: "center",
     marginBottom: "30px",
-  },
-  Logo: {
-    fontSize: "36px",
-    fontWeight: "900",
-    letterSpacing: "3px",
-    background: "linear-gradient(135deg, #006233 0%, #C1272D 100%)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    textAlign: "center",
-    marginBottom: "30px",
-    position: "absolute",
-    left: "38rem",
-    top: "0rem",
   },
 
   formHeader: {
@@ -362,28 +347,11 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: "8px",
   },
 
-  labelRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-
   label: {
     fontSize: "14px",
     fontWeight: "600",
     color: "#1a1a1a",
     display: "flex",
-  },
-
-  forgotLink: {
-    fontSize: "13px",
-    color: "#C1272D",
-    fontWeight: "600",
-    cursor: "pointer",
-    textDecoration: "underline",
-    display: "flex",
-    alignSelf: "flex-end", 
-
   },
 
   input: {
@@ -394,24 +362,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     outline: "none",
     transition: "all 0.3s ease",
     backgroundColor: "#f8f9fa",
-  },
-
-  checkboxGroup: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  },
-
-  checkbox: {
-    width: "18px",
-    height: "18px",
-    cursor: "pointer",
-  },
-
-  checkboxLabel: {
-    fontSize: "14px",
-    color: "#666",
-    cursor: "pointer",
   },
 
   submitButton: {
@@ -438,49 +388,17 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 
   divider: {
-    display: "flex",
-    alignItems: "center",
-    gap: "15px",
+    position: "relative",
+    textAlign: "center",
     margin: "30px 0",
   },
 
-  dividerLine: {
-    flex: 1,
-    height: "1px",
-    backgroundColor: "#e0e0e0",
-  },
-
   dividerText: {
+    backgroundColor: "#FFFFFF",
+    padding: "0 15px",
     color: "#999",
     fontSize: "14px",
     fontWeight: "500",
-  },
-
-  socialButtons: {
-    display: "flex",
-    gap: "12px",
-    marginBottom: "20px",
-  },
-
-  socialButton: {
-    flex: 1,
-    padding: "12px",
-    borderRadius: "10px",
-    border: "2px solid #e0e0e0",
-    backgroundColor: "#FFFFFF",
-    color: "#1a1a1a",
-    fontSize: "14px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
-  },
-
-  socialIcon: {
-    fontSize: "18px",
   },
 
   footer: {
@@ -501,4 +419,4 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 };
 
-export default Login;
+export default Signup;
