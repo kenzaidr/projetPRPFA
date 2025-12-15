@@ -150,7 +150,8 @@ export default function HomePage() {
                                 </div>
                             </div>
                             
-                            <Link to="/driver/login" className="navbar-button-login hidden md:block px-6 py-2.5 text-morocco-red font-semibold hover:bg-morocco-red/5 rounded-lg transition-all">
+                            {/* User login/signup (UserLogin page) */}
+                            <Link to="/user/login" className="navbar-button-login hidden md:block px-6 py-2.5 text-morocco-red font-semibold hover:bg-morocco-red/5 rounded-lg transition-all">
                                 {t('nav.login')}
                             </Link>
                             <Link to="/partner" className="navbar-button-become-partner px-6 py-2.5 bg-gradient-to-r from-morocco-red to-morocco-green text-white font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all">
@@ -200,8 +201,9 @@ export default function HomePage() {
                             >
                                 {t('nav.partner')}
                             </Link>
+                            {/* User login/signup (UserLogin page) */}
                             <Link 
-                                to="/driver/login"
+                                to="/user/login"
                                 className="mobile-menu-button-login w-full px-6 py-2.5 text-morocco-red font-semibold hover:bg-morocco-red/5 rounded-lg transition-all text-center border border-morocco-red/20"
                                 onClick={() => setMobileMenuOpen(false)}
                             >

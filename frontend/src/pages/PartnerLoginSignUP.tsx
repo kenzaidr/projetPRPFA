@@ -340,7 +340,7 @@ const PartnerLoginSignUP: React.FC = () => {
               >
                 <span className="flex items-center justify-center gap-1.5">
                   <Briefcase size={14} className={activeTab === 'login' ? 'text-white' : 'text-morocco-green'} />
-                  Partner Login
+                  User Login
                 </span>
               </button>
             </div>
@@ -367,7 +367,7 @@ const PartnerLoginSignUP: React.FC = () => {
                     <h1 className="partner-auth-login-title text-2xl font-bold text-gray-900 mb-1 bg-gradient-to-r from-morocco-red via-morocco-green to-morocco-gold bg-clip-text text-transparent">
                       {t('auth.login.title')}
                     </h1>
-                    <p className="partner-auth-login-subtitle text-gray-600 text-sm">Select your partner type to continue</p>
+                    <p className="partner-auth-login-subtitle text-gray-600 text-sm">Select your account type to continue</p>
                   </div>
 
                   {/* Type Selection Cards */}

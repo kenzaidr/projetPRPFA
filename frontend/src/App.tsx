@@ -12,12 +12,20 @@ const App: React.FC = () => {
   return (
     <HashRouter>
       <Routes>
+        {/* Public landing page */}
         <Route path="/" element={<HomePage />} />
+
+        {/* User authentication (login + signup tabs on same page) */}
+        <Route path="/user/login" element={<UserLogin />} />
+
+        {/* Driver / partner area */}
         <Route path="/driver" element={<DriverDashboard />} />
         <Route path="/driver/login" element={<DriverLogin />} />
         <Route path="/driver/signup" element={<DriverSignup />} />
         <Route path="/driver/verification" element={<VerificationPage />} />
         <Route path="/partner" element={<PartnerLoginSignUP />} />
+
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
