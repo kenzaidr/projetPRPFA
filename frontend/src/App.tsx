@@ -7,7 +7,7 @@ import DriverSignup from './pages/DriverSignup';
 import DriverLogin from './pages/DriverLogin';
 import PartnerLoginSignUP from './pages/PartnerLoginSignUP';
 import VerificationPage from './pages/VerificationPage';
-
+import Restaurant from './features/restaurant/src/pages/Food.tsx';
 const App: React.FC = () => {
   return (
     <HashRouter>
@@ -18,6 +18,7 @@ const App: React.FC = () => {
         <Route path="/driver/signup" element={<DriverSignup />} />
         <Route path="/driver/verification" element={<VerificationPage />} />
         <Route path="/partner" element={<PartnerLoginSignUP />} />
+        <Route path="/restaurant" element={<Restaurant />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
