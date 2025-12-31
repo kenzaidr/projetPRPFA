@@ -370,13 +370,16 @@ export default function HomePage() {
                                     {t('services.food.description')}
                                 </p>
                                 
-                                <div className="service-cta-container flex justify-end w-full">
-                                    <button className="service-cta-button-food text-morocco-green font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
+                                <div className="flex justify-end w-full">
+                                    <Link 
+                                        to="/restaurant" 
+                                        className="text-morocco-green font-semibold flex items-center gap-2 group-hover:gap-3 transition-all"
+                                    >
                                         <span>{t('services.food.cta')}</span>
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
                                         </svg>
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
