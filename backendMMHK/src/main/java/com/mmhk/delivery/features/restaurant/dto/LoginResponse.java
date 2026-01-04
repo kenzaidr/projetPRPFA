@@ -1,5 +1,5 @@
 
-package com.mmhk.delivery.auth;
+package com.mmhk.delivery.features.restaurant.dto;
 public class LoginResponse {
     private String token;
     private String message;
