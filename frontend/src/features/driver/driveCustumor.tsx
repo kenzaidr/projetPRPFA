@@ -7,7 +7,9 @@ const translations = {
   ar: {
     // Navigation
     'nav.services': 'الخدمات',
+    'nav.howItWorks': 'كيف يعمل',
     'nav.safety': 'الأمان',
+    'nav.partner': 'كن شريكاً',
     'nav.about': 'حول',
     'nav.help': 'مساعدة',
     'nav.login': 'تسجيل الدخول',
@@ -104,7 +106,9 @@ const translations = {
   fr: {
     // Navigation
     'nav.services': 'Services',
+    'nav.howItWorks': 'Comment ça marche',
     'nav.safety': 'Sécurité',
+    'nav.partner': 'Devenir partenaire',
     'nav.about': 'À propos',
     'nav.help': 'Aide',
     'nav.login': 'Connexion',
@@ -193,7 +197,9 @@ const translations = {
   en: {
     // Navigation
     'nav.services': 'Services',
+    'nav.howItWorks': 'How it works',
     'nav.safety': 'Safety',
+    'nav.partner': 'Become a Partner',
     'nav.about': 'About',
     'nav.help': 'Help',
     'nav.login': 'Login',
@@ -408,70 +414,117 @@ const Ride: React.FC = () => {
 
   return (
     <div className="ride-landing">
-      {/* Header */}
-      <header className="ride-header">
-        <div className="header-container">
-          <Link to="/" className="logo-section">
-            <div className="logo-icon">G</div>
-            <span className="logo-text">Grab Morocco</span>
-          </Link>
-          
-          <nav className="header-nav">
-            <a href="#services" className="nav-link">{t('nav.services')}</a>
-            <a href="#safety" className="nav-link">{t('nav.safety')}</a>
-            <a href="#about" className="nav-link">{t('nav.about')}</a>
-            <a href="#help" className="nav-link">{t('nav.help')}</a>
-          </nav>
-
-          <div className="header-actions">
-            <div className="language-switcher">
-              <button 
-                className="btn-language"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowLanguageDropdown(!showLanguageDropdown);
-                }}
-                aria-label="Changer de langue"
-              >
-                <svg className="language-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                </svg>
-                <span className="language-code">{language.toUpperCase()}</span>
-              </button>
-              {showLanguageDropdown && (
-                <div className="language-dropdown">
-                  <button
-                    className={`language-option ${language === 'ar' ? 'active' : ''}`}
-                    onClick={() => handleLanguageChange('ar')}
-                    data-lang="ar"
-                  >
-                    <span className="language-flag">🇲🇦</span>
-                    <span className="language-name">العربية</span>
-                  </button>
-                  <button
-                    className={`language-option ${language === 'fr' ? 'active' : ''}`}
-                    onClick={() => handleLanguageChange('fr')}
-                    data-lang="fr"
-                  >
-                    <span className="language-flag">🇫🇷</span>
-                    <span className="language-name">Français</span>
-                  </button>
-                  <button
-                    className={`language-option ${language === 'en' ? 'active' : ''}`}
-                    onClick={() => handleLanguageChange('en')}
-                    data-lang="en"
-                  >
-                    <span className="language-flag">🇬🇧</span>
-                    <span className="language-name">English</span>
-                  </button>
+            {/* Navigation */}
+            <nav className="navbar-main fixed w-full bg-white/95 backdrop-blur-md shadow-sm z-50 transition-all duration-300">
+                <div className="navbar-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="navbar-content flex justify-between items-center h-20">
+                        <div className="navbar-logo flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+                            <div className="logo-icon w-10 h-10 bg-gradient-to-br from-morocco-red to-morocco-green rounded-lg flex items-center justify-center shadow-md">
+                                <span className="logo-letter text-white font-bold text-xl">G</span>
+                            </div>
+                            <span className="logo-text text-2xl font-bold bg-gradient-to-r from-morocco-red to-morocco-green bg-clip-text text-transparent">Grab Morocco</span>
+                        </div>
+                        
+                        <div className="navbar-links-desktop hidden md:flex items-center gap-8">
+                            <a 
+                                href="#services" 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    const element = document.getElementById('services');
+                                    if (element) {
+                                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }
+                                }}
+                                className="nav-link-services text-gray-700 hover:text-morocco-red transition-colors font-medium"
+                            >
+                                {t('nav.services')}
+                            </a>
+                            <a 
+                                href="#how-it-works" 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    const element = document.getElementById('how-it-works');
+                                    if (element) {
+                                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }
+                                }}
+                                className="nav-link-how-it-works text-gray-700 hover:text-morocco-red transition-colors font-medium"
+                            >
+                                {t('nav.howItWorks')}
+                            </a>
+                            <a 
+                                href="#safety" 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    const element = document.getElementById('safety');
+                                    if (element) {
+                                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }
+                                }}
+                                className="nav-link-safety text-gray-700 hover:text-morocco-red transition-colors font-medium"
+                            >
+                                {t('nav.safety')}
+                            </a>
+                            <Link 
+                                to="/partner"
+                                className="nav-link-partner text-gray-700 hover:text-morocco-red transition-colors font-medium flex items-center gap-1"
+                            >
+                                {t('nav.partner')}
+                            </Link>
+                        </div>
+                        
+                        <div className="navbar-actions flex items-center gap-4">
+                            {/* Language Switcher */}
+                            <div className="language-switcher-container relative language-switcher">
+                                <button 
+                                    onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+                                    className="language-switcher-button flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all"
+                                >
+                                    <span className="language-code-badge w-5 h-5 flex items-center justify-center text-gray-700 font-bold text-xs border border-gray-300 rounded-sm">
+                                        {language.toUpperCase()}
+                                    </span>
+                                    <span className="language-code-text font-medium text-gray-700 hidden sm:inline">{language.toUpperCase()}</span>
+                                    <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div 
+                                    className={`language-dropdown-menu ${showLanguageDropdown ? '' : 'hidden'} absolute top-full mt-2 right-0 bg-white rounded-lg shadow-xl border border-gray-200 py-2 min-w-[150px] z-50`}
+                                >
+                                    <button 
+                                        onClick={() => handleLanguageChange('ar')}
+                                        className={`language-option-arabic w-full px-4 py-2 text-right hover:bg-morocco-red/5 transition-colors flex items-center justify-between gap-3 ${language === 'ar' ? 'bg-morocco-red/10 text-morocco-red font-semibold' : ''}`}
+                                    >
+                                        <span className="language-label font-medium">العربية</span>
+                                        <span className="language-code text-sm text-gray-500">AR</span>
+                                    </button>
+                                    <button 
+                                        onClick={() => handleLanguageChange('fr')}
+                                        className={`language-option-french w-full px-4 py-2 text-right hover:bg-morocco-red/5 transition-colors flex items-center justify-between gap-3 ${language === 'fr' ? 'bg-morocco-red/10 text-morocco-red font-semibold' : ''}`}
+                                    >
+                                        <span className="language-label font-medium">Français</span>
+                                        <span className="language-code text-sm text-gray-500">FR</span>
+                                    </button>
+                                    <button 
+                                        onClick={() => handleLanguageChange('en')}
+                                        className={`language-option-english w-full px-4 py-2 text-right hover:bg-morocco-red/5 transition-colors flex items-center justify-between gap-3 ${language === 'en' ? 'bg-morocco-red/10 text-morocco-red font-semibold' : ''}`}
+                                    >
+                                        <span className="language-label font-medium">English</span>
+                                        <span className="language-code text-sm text-gray-500">EN</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <Link to="/driver/login" className="navbar-button-login hidden md:block px-6 py-2.5 text-morocco-red font-semibold hover:bg-morocco-red/5 rounded-lg transition-all">
+                                {t('nav.login')}
+                            </Link>
+                            <Link to="/partner" className="navbar-button-become-partner px-6 py-2.5 bg-gradient-to-r from-morocco-red to-morocco-green text-white font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all">
+                                {t('nav.partner')}
+                            </Link>
+                        </div>
+                    </div>
                 </div>
-              )}
-            </div>
-            <button className="btn-login">{t('nav.login')}</button>
-            <button className="btn-signup">{t('nav.signup')}</button>
-          </div>
-        </div>
-      </header>
+            </nav>
 
       {/* Hero Section */}
       <section className="hero-section">
