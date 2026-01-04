@@ -788,9 +788,22 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
+.feature-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
 .feature-icon {
   font-size: 3rem;
-  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-content {
+  text-align: center;
 }
 
 .feature-title {

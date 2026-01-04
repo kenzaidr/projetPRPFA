@@ -751,51 +751,75 @@ const Ride: React.FC = () => {
           
           <div className="features-grid">
             <div className="feature-card">
-              <div className="feature-icon">🛡️</div>
-              <h3 className="feature-title">{t('features.safety.title')}</h3>
-              <p className="feature-description">
-                {t('features.safety.desc')}
-              </p>
+              <div className="feature-icon-container">
+                <div className="feature-icon">🛡️</div>
+              </div>
+              <div className="feature-content">
+                <h3 className="feature-title">{t('features.safety.title')}</h3>
+                <p className="feature-description">
+                  {t('features.safety.desc')}
+                </p>
+              </div>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">💰</div>
-              <h3 className="feature-title">{t('features.pricing.title')}</h3>
-              <p className="feature-description">
-                {t('features.pricing.desc')}
-              </p>
+              <div className="feature-icon-container">
+                <div className="feature-icon">💰</div>
+              </div>
+              <div className="feature-content">
+                <h3 className="feature-title">{t('features.pricing.title')}</h3>
+                <p className="feature-description">
+                  {t('features.pricing.desc')}
+                </p>
+              </div>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">⚡</div>
-              <h3 className="feature-title">{t('features.fast.title')}</h3>
-              <p className="feature-description">
-                {t('features.fast.desc')}
-              </p>
+              <div className="feature-icon-container">
+                <div className="feature-icon">⚡</div>
+              </div>
+              <div className="feature-content">
+                <h3 className="feature-title">{t('features.fast.title')}</h3>
+                <p className="feature-description">
+                  {t('features.fast.desc')}
+                </p>
+              </div>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">📱</div>
-              <h3 className="feature-title">{t('features.payment.title')}</h3>
-              <p className="feature-description">
-                {t('features.payment.desc')}
-              </p>
+              <div className="feature-icon-container">
+                <div className="feature-icon">📱</div>
+              </div>
+              <div className="feature-content">
+                <h3 className="feature-title">{t('features.payment.title')}</h3>
+                <p className="feature-description">
+                  {t('features.payment.desc')}
+                </p>
+              </div>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">🌍</div>
-              <h3 className="feature-title">{t('features.available.title')}</h3>
-              <p className="feature-description">
-                {t('features.available.desc')}
-              </p>
+              <div className="feature-icon-container">
+                <div className="feature-icon">🌍</div>
+              </div>
+              <div className="feature-content">
+                <h3 className="feature-title">{t('features.available.title')}</h3>
+                <p className="feature-description">
+                  {t('features.available.desc')}
+                </p>
+              </div>
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon">⭐</div>
-              <h3 className="feature-title">{t('features.drivers.title')}</h3>
-              <p className="feature-description">
-                {t('features.drivers.desc')}
-              </p>
+              <div className="feature-icon-container">
+                <div className="feature-icon">⭐</div>
+              </div>
+              <div className="feature-content">
+                <h3 className="feature-title">{t('features.drivers.title')}</h3>
+                <p className="feature-description">
+                  {t('features.drivers.desc')}
+                </p>
+              </div>
             </div>
           </div>
         </div>
