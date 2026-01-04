@@ -248,14 +248,15 @@ export default function HomePage() {
                             </p>
                             
                             <div className="hero-cta-buttons flex flex-wrap gap-4 justify-end lg:justify-start rtl:lg:justify-end mb-8">
-                                <button className="hero-button-book-now group px-8 py-4 bg-gradient-to-r from-morocco-red to-morocco-green text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                                    <span className="flex items-center gap-2">
-                                        <span>{t('hero.bookNow')}</span>
-                                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
-                                        </svg>
-                                    </span>
-                                </button>
+                                <Link 
+                                    to="/ride" 
+                                    className="hero-button-book-now group px-8 py-4 bg-gradient-to-r from-morocco-red to-morocco-green text-white font-bold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
+                                >
+                                    <span>{t('hero.bookNow')}</span>
+                                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                </Link>
                                 <button className="hero-button-watch-video px-8 py-4 bg-white border-2 border-morocco-red text-morocco-red font-bold rounded-xl hover:bg-morocco-red hover:text-white transition-all duration-300 flex items-center gap-2">
                                     <Play size={20} fill="currentColor" />
                                     {t('hero.watchVideo')}
