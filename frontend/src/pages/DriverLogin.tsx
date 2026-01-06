@@ -235,12 +235,12 @@ const DriverLogin: React.FC = () => {
               </button>
             </form>
 
-            {/* Footer */}
-            <div className="login-footer mt-8 pt-6 border-t-2 border-gray-100/50 text-center">
+           {/* Footer */}
+           <div className="login-footer mt-8 pt-6 border-t-2 border-gray-100/50 text-center">
               <p className="login-footer-text text-gray-600">
                 {t('auth.login.noAccount')}{' '}
                 <Link
-                  to="/driver/signup"
+                  to="/partner"
                   className="login-signup-link text-morocco-red hover:text-morocco-green font-bold transition-all duration-300 ml-1 inline-block hover:underline hover:scale-105"
                 >
                   {t('auth.login.signupLink')}
