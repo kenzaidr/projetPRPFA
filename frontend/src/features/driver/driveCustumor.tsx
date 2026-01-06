@@ -18,7 +18,6 @@ const translations = {
     'hero.title': 'احجز رحلتك في ثوانٍ',
     'hero.subtitle': 'تنقل بسهولة في جميع أنحاء المغرب مع سائقين موثوقين وأسعار شفافة',
     'booking.tab.ride': 'رحلة',
-    'booking.tab.delivery': 'توصيل',
     'form.where': 'إلى أين تذهب؟',
     'form.destination.placeholder': 'أدخل وجهتك',
     'form.pickup': 'نقطة الانطلاق',
@@ -40,14 +39,7 @@ const translations = {
     'schedule.confirm': 'تأكيد',
     'location.allow': 'السماح بالوصول إلى الموقع',
     'location.allow.desc': 'يوفر عنوان الاستلام الخاص بك',
-    'schedule.button': 'Planifier plus tard',
-    'schedule.modal.title': 'Choisir le type de prise en charge',
-    'schedule.immediate': 'Prise en charge immédiate',
-    'schedule.later': 'Planifier plus tard',
-    'schedule.date': 'Date',
-    'schedule.time': 'Heure',
-    'schedule.cancel': 'Annuler',
-    'schedule.confirm': 'Confirmer',
+    
     // Features
     'features.title': 'لماذا Grab Morocco؟',
     'features.safety.title': 'أمان مضمون',
@@ -117,7 +109,7 @@ const translations = {
     'hero.title': 'Réservez votre course en quelques secondes',
     'hero.subtitle': 'Déplacez-vous facilement dans tout le Maroc avec des conducteurs vérifiés et des tarifs transparents',
     'booking.tab.ride': 'Course',
-    'booking.tab.delivery': 'Livraison',
+
     'form.where': 'Où allez-vous ?',
     'form.destination.placeholder': 'Entrez votre destination',
     'form.pickup': 'Point de départ',
@@ -208,7 +200,6 @@ const translations = {
     'hero.title': 'Book your ride in seconds',
     'hero.subtitle': 'Move easily throughout Morocco with verified drivers and transparent pricing',
     'booking.tab.ride': 'Ride',
-    'booking.tab.delivery': 'Delivery',
     'form.where': 'Where are you going?',
     'form.destination.placeholder': 'Enter your destination',
     'form.pickup': 'Pickup point',
@@ -540,24 +531,11 @@ const Ride: React.FC = () => {
           <div className="booking-card">
             <div className="booking-tabs">
               <button className="tab active">{t('booking.tab.ride')}</button>
-              <button className="tab">{t('booking.tab.delivery')}</button>
             </div>
 
             <form className="booking-form">
               {/* Schedule Button */}
-              <button
-                type="button"
-                className="schedule-button"
-                onClick={() => setShowScheduleModal(true)}
-              >
-                <svg className="schedule-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {scheduleType === 'immediate' ? t('schedule.immediate') : t('schedule.button')}
-                <svg className="schedule-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+              
 
               <div className="form-group">
                 <label className="form-label">
