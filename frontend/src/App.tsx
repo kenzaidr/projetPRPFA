@@ -17,6 +17,7 @@ const App: React.FC = () => {
         <Route path="/driver/login" element={<DriverLogin />} />
         <Route path="/driver/signup" element={<DriverSignup />} />
         <Route path="/driver/verification" element={<VerificationPage />} />
+        <Route path="/user/login" element={<UserLogin />} />
         <Route path="/partner" element={<PartnerLoginSignUP />} />
         <Route path="/restaurant" element={<Restaurant />} />
         <Route path="*" element={<Navigate to="/" replace />} />

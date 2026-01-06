@@ -210,7 +210,7 @@ const UserLogin: React.FC = () => {
       setIsLoadingSignup(true);
       setTimeout(() => {
         setIsLoadingSignup(false);
-        navigate('/driver');
+        navigate('/');
       }, 2000);
     } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -298,7 +298,7 @@ const UserLogin: React.FC = () => {
               >
                 <span className="flex items-center justify-center gap-1.5">
                   <User size={14} className={activeTab === 'login' ? 'text-white' : 'text-morocco-red'} />
-                  {t('auth.login.title')}
+                  User Login
                 </span>
               </button>
               <button
@@ -311,7 +311,7 @@ const UserLogin: React.FC = () => {
               >
                 <span className="flex items-center justify-center gap-1.5">
                   <Zap size={14} className={activeTab === 'signup' ? 'text-white' : 'text-morocco-gold'} />
-                  {t('auth.signup.title')}
+                  User Sign Up
                 </span>
               </button>
             </div>
@@ -331,7 +331,7 @@ const UserLogin: React.FC = () => {
 
               <div className="user-login-header-text text-center mb-4 relative z-10">
                 <h1 className="user-login-title text-2xl font-bold text-gray-900 mb-1 bg-gradient-to-r from-morocco-red via-morocco-green to-morocco-gold bg-clip-text text-transparent">
-                  {t('auth.login.title')}
+                  User Login
                 </h1>
                 <p className="user-login-subtitle text-gray-600 text-sm">{t('auth.login.subtitle')}</p>
               </div>
@@ -431,7 +431,7 @@ const UserLogin: React.FC = () => {
               <div className="user-signup-content p-4 md:p-6 relative z-10">
                 <div className="user-signup-header text-center mb-4">
                   <h1 className="user-signup-title text-2xl md:text-3xl font-bold text-gray-900 mb-1 bg-gradient-to-r from-morocco-red via-morocco-green to-morocco-gold bg-clip-text text-transparent">
-                    {t('auth.signup.title')}
+                    User Sign Up
                   </h1>
                   <p className="user-signup-subtitle text-gray-600 text-sm">{t('auth.signup.subtitle')}</p>
                 </div>
@@ -513,7 +513,7 @@ const UserLogin: React.FC = () => {
                   </div>
 
                   <div className={`flex items-center gap-2 mb-4 mt-4 p-2.5 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors ${errors.agreedToTerms ? 'ring-2 ring-red-200 bg-red-50' : ''}`}
-                       onClick={() => setFormData(prev => ({ ...prev, agreedToTerms: !prev.agreedToTerms }))}>
+                        onClick={() => setFormData(prev => ({ ...prev, agreedToTerms: !prev.agreedToTerms }))}>
                     <div className={`w-4 h-4 rounded-md border-2 flex items-center justify-center transition-colors ${formData.agreedToTerms ? 'bg-morocco-green border-morocco-green' : 'border-gray-300 bg-white'}`}>
                       {formData.agreedToTerms && <CheckCircle2 size={12} className="text-white" />}
                     </div>
@@ -548,4 +548,3 @@ const UserLogin: React.FC = () => {
 };
 
 export default UserLogin;
-

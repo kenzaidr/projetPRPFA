@@ -15,17 +15,17 @@ const translationsDict: Record<string, Record<Language, string>> = {
     'nav.downloadApp': { ar: 'حمل التطبيق', fr: 'Télécharger', en: 'Download App' },
     'nav.backToHome': { ar: 'العودة إلى الصفحة الرئيسية', fr: 'Retour à l\'accueil', en: 'Back to Home' },
     
-    // Auth General (Partner)
-    'auth.login.title': { ar: 'تسجيل دخول الشركاء', fr: 'Connexion Partenaire', en: 'Partner Login' },
-    'auth.login.subtitle': { ar: 'إدارة أعمالك أو رحلاتك', fr: 'Gérez votre activité ou vos courses', en: 'Manage your business or drives' },
+    // Auth General (User)
+    'auth.login.title': { ar: 'تسجيل الدخول', fr: 'Connexion', en: 'User Login' },
+    'auth.login.subtitle': { ar: 'سجل الدخول للوصول إلى حسابك', fr: 'Connectez-vous pour accéder à votre compte', en: 'Sign in to access your account' },
     'auth.login.email': { ar: 'البريد الإلكتروني أو الهاتف', fr: 'Email ou Téléphone', en: 'Email or Phone' },
     'auth.login.emailPlaceholder': { ar: 'name@example.com', fr: 'nom@exemple.com', en: 'name@example.com' },
     'auth.login.password': { ar: 'كلمة المرور', fr: 'Mot de passe', en: 'Password' },
     'auth.login.passwordPlaceholder': { ar: 'أدخل كلمة المرور', fr: 'Entrez votre mot de passe', en: 'Enter your password' },
     'auth.login.forgotPassword': { ar: 'نسيت كلمة المرور؟', fr: 'Mot de passe oublié ?', en: 'Forgot Password?' },
-    'auth.login.submit': { ar: 'دخول كشريك', fr: 'Se connecter', en: 'Login as Partner' },
+    'auth.login.submit': { ar: 'تسجيل الدخول', fr: 'Se connecter', en: 'Login' },
     'auth.login.noAccount': { ar: 'ليس لديك حساب؟', fr: 'Pas de compte ?', en: 'Don\'t have an account?' },
-    'auth.login.signupLink': { ar: 'انضم كشريك', fr: 'Devenir Partenaire', en: 'Join as Partner' },
+    'auth.login.signupLink': { ar: 'سجل الآن', fr: 'S\'inscrire', en: 'Sign Up' },
     'auth.error.invalidCredentials': { ar: 'البريد الإلكتروني أو كلمة المرور غير صحيحة', fr: 'Email ou mot de passe incorrect', en: 'Invalid email or password' },
 
     // Signup General
