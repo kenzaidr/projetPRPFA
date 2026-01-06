@@ -1252,52 +1252,7 @@ const RideBooking: React.FC = () => {
               </div>
             </div>
 
-            {/* Passenger Type */}
-            <div className="form-field">
-              <label className="field-label">
-                <svg className="field-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </label>
-              <div className="dropdown-wrapper">
-                <button
-                  type="button"
-                  className="dropdown-button"
-                  onClick={() => {
-                    setShowPassengerDropdown(!showPassengerDropdown);
-                  }}
-                >
-                  <span>Pour moi</span>
-                  <svg className="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {showPassengerDropdown && (
-                  <div className="dropdown-menu">
-                    <button
-                      type="button"
-                      className="dropdown-item"
-                      onClick={() => {
-                        setPassengerType('me');
-                        setShowPassengerDropdown(false);
-                      }}
-                    >
-                      Pour moi
-                    </button>
-                    <button
-                      type="button"
-                      className="dropdown-item"
-                      onClick={() => {
-                        setPassengerType('someone');
-                        setShowPassengerDropdown(false);
-                      }}
-                    >
-                      Pour quelqu'un d'autre
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+            
 
             {/* Search Button */}
             <button type="submit" className="search-button">
