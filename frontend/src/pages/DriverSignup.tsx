@@ -27,6 +27,7 @@ import {
   type Language 
 } from '../utils/translations';
 import type { PartnerRegistrationData } from '../types';
+import { driverService } from '../services/driverService';
 
 const DriverSignup: React.FC = () => {
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ const DriverSignup: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof PartnerRegistrationData, string>>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const t = (key: string) => getTranslation(key, currentLang);
   const config = languageConfig[currentLang];
@@ -135,16 +137,58 @@ const DriverSignup: React.FC = () => {
     return isValid && Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      setIsLoading(true);
-      setTimeout(() => {
+    setSubmitError(null);
+    
+    if (!validate()) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Only handle driver registration for now
+    if (formData.partnerType !== 'driver') {
+      setSubmitError('Restaurant registration is not yet implemented');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const registerData = {
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        vehicleModel: formData.vehicleModel || '',
+        licensePlate: formData.licensePlate || '',
+        vehicleColor: formData.vehicleType || 'Unknown'
+      };
+
+      const response = await driverService.register(registerData);
+      
+      if (response.driverId) {
+        // Store driver ID for later login
+        localStorage.setItem('driverId', response.driverId.toString());
+        localStorage.setItem('driverEmail', response.email);
+        
+        // Navigate to login page or directly to dashboard
+        // You can change this to navigate('/driver') if you want auto-login
+        navigate('/driver/login', { 
+          state: { 
+            message: 'Registration successful! Please login with your credentials.',
+            email: response.email 
+          } 
+        });
+      } else {
+        setSubmitError(response.message || 'Registration failed');
         setIsLoading(false);
-        navigate('/driver');
-      }, 2000);
-    } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      setSubmitError(error.message || 'Registration failed. Please try again.');
+      setIsLoading(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -252,6 +296,14 @@ const DriverSignup: React.FC = () => {
             {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-morocco-red/10 to-transparent rounded-bl-full"></div>
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-morocco-green/10 to-transparent rounded-tr-full"></div>
+            
+            {/* Error Message Display */}
+            {submitError && (
+              <div className={`signup-error-alert p-6 mx-8 mt-8 rounded-2xl bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-200/50 flex items-start gap-3 shadow-lg animate-in slide-in-from-top-2 relative z-20 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={24} />
+                <span className={`text-sm text-red-700 font-medium ${isRTL ? 'text-right' : 'text-left'}`}>{submitError}</span>
+              </div>
+            )}
             
             {/* PARTNER TYPE SELECTION */}
             <div className="signup-type-selection p-8 md:p-10 pb-6 relative z-10">

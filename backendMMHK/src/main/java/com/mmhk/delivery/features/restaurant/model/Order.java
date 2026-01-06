@@ -14,6 +14,8 @@ public class Order {
     @Column(nullable = false)
     private Long restaurantId; // ⬅️ AJOUTEZ CE CHAMP!
 
+    private Long driverId; // Driver assigned to this order
+
     @Column(nullable = false)
     private String deliveryAddress;
 
@@ -43,6 +45,14 @@ public class Order {
 
     public void setRestaurantId(Long restaurantId) {
         this.restaurantId = restaurantId;
+    }
+
+    public Long getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(Long driverId) {
+        this.driverId = driverId;
     }
 
     // ---- Autres getters/setters existants ----
