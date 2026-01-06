@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, MapPin, ShoppingCart } from 'lucide-react';
+import { Search, Filter, MapPin, Heart } from 'lucide-react';
 // @ts-ignore
 import RestaurantList from '../components/food/RestaurantList';
 // @ts-ignore
@@ -31,7 +31,7 @@ interface Favorite {
   isFavorite: boolean;
 }
 
-type ViewMode = 'list' | 'map' | 'detail' | 'checkout';
+type ViewMode = 'list' | 'map' | 'detail' | 'checkout' | 'favorites';
 
 export default function Food() {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -54,6 +54,7 @@ export default function Food() {
     : ['Tous'];
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  
   // Charger la localisation depuis localStorage
   useEffect(() => {
     const savedLocation = localStorage.getItem('userLocation');
@@ -72,6 +73,15 @@ export default function Food() {
                          restaurant.cuisine.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCity = selectedCity === 'Tous' || restaurant.city === selectedCity;
     return matchesSearch && matchesCity;
+  });
+
+  // Filtrer uniquement les restaurants favoris
+  const favoriteRestaurants = (RESTAURANTS || []).filter((restaurant: any) => {
+    const isFav = favorites.find(f => f.id === restaurant.id)?.isFavorite || false;
+    const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         restaurant.cuisine.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCity = selectedCity === 'Tous' || restaurant.city === selectedCity;
+    return isFav && matchesSearch && matchesCity;
   });
 
   const toggleFavorite = (restaurantId: number) => {
@@ -95,11 +105,9 @@ export default function Food() {
   };
 
   const handleConfirmOrder = (_orderData: any) => {
-    // Réinitialiser le panier après confirmation
     setCart([]);
     setViewMode('list');
     setSelectedRestaurant(null);
-    // Vous pouvez ajouter une notification de succès ici
     alert('Commande confirmée avec succès !');
   };
 
@@ -172,7 +180,6 @@ export default function Food() {
     const subtotal = restaurantCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const total = subtotal + restaurant.deliveryFee;
     
-
     return (
       <Checkout
         cart={restaurantCart}
@@ -226,17 +233,109 @@ export default function Food() {
           onUpdateQuantity={(itemId: number, quantity: number) => updateCartQuantity(itemId, selectedRestaurant.id, quantity)}
           onCheckout={handleCheckout}
         />
-        
       </>
     );
   }
 
+  // Page des favoris
+  if (viewMode === 'favorites') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={() => setViewMode('list')}
+                className="text-gray-600 hover:text-morocco-red transition-colors font-medium flex items-center gap-2"
+              >
+                ← Retour
+              </button>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-morocco-red to-morocco-green bg-clip-text text-transparent flex items-center gap-2">
+                <Heart className="text-red-500 fill-red-500" size={32} />
+                Mes Favoris
+              </h1>
+              <div className="w-24"></div>
+            </div>
+
+            {/* Search and Filter */}
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Rechercher dans mes favoris..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-morocco-red/50"
+                />
+              </div>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <select
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                  className="pl-10 pr-8 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-morocco-red/50 appearance-none bg-white"
+                >
+                  {(cities as string[]).map((city: string) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Favorites List */}
+        <main className="max-w-7xl mx-auto px-4 py-8">
+          {favoriteRestaurants.length === 0 ? (
+            <div className="text-center py-16">
+              <Heart className="mx-auto text-gray-300 mb-4" size={64} />
+              <p className="text-gray-500 text-lg mb-2">Aucun restaurant favori</p>
+              <p className="text-gray-400 text-sm mb-6">Ajoutez des restaurants à vos favoris pour les retrouver ici</p>
+              <button
+                onClick={() => setViewMode('list')}
+                className="px-6 py-3 bg-morocco-red text-white rounded-lg hover:shadow-lg transition-all"
+              >
+                Découvrir les restaurants
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="mb-6">
+                <p className="text-gray-600">
+                  <span className="font-semibold text-morocco-red">{favoriteRestaurants.length}</span> restaurant{favoriteRestaurants.length > 1 ? 's' : ''} favori{favoriteRestaurants.length > 1 ? 's' : ''}
+                </p>
+              </div>
+              <RestaurantList
+                restaurants={favoriteRestaurants}
+                favorites={favorites}
+                onSelectRestaurant={handleSelectRestaurant}
+                onToggleFavorite={toggleFavorite}
+              />
+            </>
+          )}
+        </main>
+      </div>
+    );
+  }
+
+  // Page principale (liste)
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-4">
+            <a
+              href="./main"
+              className="flex items-center gap-3 px-4 py-2 text-gray-800 rounded-lg hover:shadow-lg transition-all"
+            >
+              <div className="logo-icon w-10 h-10 bg-gradient-to-br from-morocco-red to-morocco-green rounded-lg flex items-center justify-center shadow-md">
+                <span className="logo-letter text-white font-bold text-xl">G</span>
+              </div>
+              <span>Retour</span>
+            </a>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-morocco-red to-morocco-green bg-clip-text text-transparent">
               Restaurants au Maroc
             </h1>
@@ -248,8 +347,6 @@ export default function Food() {
                 <MapPin size={18} />
                 <span>Carte</span>
               </button>
-             
-
             </div>
           </div>
 
@@ -265,17 +362,31 @@ export default function Food() {
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-morocco-red/50"
               />
             </div>
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                className="pl-10 pr-8 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-morocco-red/50 appearance-none bg-white"
+            <div className="flex gap-2">
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <select
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                  className="pl-10 pr-8 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-morocco-red/50 appearance-none bg-white"
+                >
+                  {(cities as string[]).map((city: string) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                onClick={() => setViewMode('favorites')}
+                className="px-4 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all flex items-center gap-2 font-medium shadow-sm hover:shadow-md"
               >
-                {(cities as string[]).map((city: string) => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
+                <Heart size={20} className="fill-white" />
+                <span>Favoris</span>
+                {favoriteRestaurants.length > 0 && (
+                  <span className="bg-white text-red-500 px-2 py-0.5 rounded-full text-sm font-bold">
+                    {favoriteRestaurants.length}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -302,14 +413,13 @@ export default function Food() {
         )}
       </main>
       {cartOpen && cart.length > 0 && (
-  <Cart
-    items={cart}
-    total={cart.reduce((sum, item) => sum + item.price * item.quantity, 0)}
-    onCheckout={handleCheckout}
-    onClose={() => setCartOpen(false)}
-  />
-)}
+        <Cart
+          items={cart}
+          total={cart.reduce((sum, item) => sum + item.price * item.quantity, 0)}
+          onCheckout={handleCheckout}
+          onClose={() => setCartOpen(false)}
+        />
+      )}
     </div>
   );
 }
-
