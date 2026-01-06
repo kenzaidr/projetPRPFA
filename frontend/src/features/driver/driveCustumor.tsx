@@ -282,9 +282,9 @@ const Ride: React.FC = () => {
   const navigate = useNavigate();
   const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
-  const [rideType, setRideType] = useState('standard');
-  const [language, setLanguage] = useState(() => {
-    return localStorage.getItem('language') || 'fr';
+  const [rideType] = useState('standard');
+  const [language, setLanguage] = useState<'ar' | 'fr' | 'en'>(() => {
+    return (localStorage.getItem('language') as 'ar' | 'fr' | 'en') || 'fr';
   });
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -292,14 +292,11 @@ const Ride: React.FC = () => {
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
   const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
-  const [locationSuggestions, setLocationSuggestions] = useState([
-    { address: 'Calle Pedro Barba 4', city: '35500 Arrecife, ES' },
-    { address: 'Calle Pedro Barba 6', city: '35500 Arrecife, ES' },
-  ]);
+  
 
   // Fonction de traduction
-  const t = (key) => {
-    return translations[language]?.[key] || key;
+  const t = (key: string): string => {
+    return (translations[language] as any)?.[key] || key;
   };
 
   const handleBookRide = () => {
@@ -345,12 +342,12 @@ const Ride: React.FC = () => {
     }
   };
 
-  const handleSelectSuggestion = (address) => {
+  const handleSelectSuggestion = (address: string) => {
     setPickup(address);
     setShowPickupSuggestions(false);
   };
 
-  const handleLanguageChange = (lang) => {
+  const handleLanguageChange = (lang: 'ar' | 'fr' | 'en') => {
     setLanguage(lang);
     localStorage.setItem('language', lang);
     setShowLanguageDropdown(false);
@@ -372,8 +369,8 @@ const Ride: React.FC = () => {
 
   // Fermer le dropdown quand on clique en dehors
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showLanguageDropdown && !event.target.closest('.language-switcher')) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showLanguageDropdown && !(event.target as HTMLElement)?.closest('.language-switcher')) {
         setShowLanguageDropdown(false);
       }
     };
@@ -383,7 +380,7 @@ const Ride: React.FC = () => {
 
   // Fermer le modal avec la touche Escape
   useEffect(() => {
-    const handleEscape = (event) => {
+    const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && showScheduleModal) {
         setShowScheduleModal(false);
       }
@@ -394,8 +391,8 @@ const Ride: React.FC = () => {
 
   // Fermer les suggestions quand on clique en dehors
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showPickupSuggestions && !event.target.closest('.pickup-group')) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showPickupSuggestions && !(event.target as HTMLElement)?.closest('.pickup-group')) {
         setShowPickupSuggestions(false);
       }
     };

@@ -2,40 +2,54 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './ride.css';
 
+// Type definitions
+interface LocationCoords {
+  lat: number;
+  lng: number;
+}
+
+interface Stop {
+  id: string;
+  address: string;
+  lat: number | null;
+  lng: number | null;
+}
+
 const RideBooking: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const mapRef = useRef(null);
-  const mapInstanceRef = useRef(null);
-  const currentLocationMarkerRef = useRef(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const currentLocationMarkerRef = useRef<any>(null);
   
   // Récupérer les données du formulaire précédent si disponibles
   const [pickup, setPickup] = useState(location.state?.pickup || '');
   const [destination, setDestination] = useState(location.state?.destination || '');
-  const [passengerType, setPassengerType] = useState('me');
+  const [passengerType] = useState('me');
   
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showPickupDropdown, setShowPickupDropdown] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState<LocationCoords | null>(null);
   const [currentAddress, setCurrentAddress] = useState('');
-  const [stops, setStops] = useState([]); // Array of { id, address, lat, lng }
-  const [selectingLocation, setSelectingLocation] = useState(null); // 'pickup', 'destination', or stop id
+  const [stops, setStops] = useState<Stop[]>([]); // Array of { id, address, lat, lng }
+  const [selectingLocation, setSelectingLocation] = useState<string | null>(null); // 'pickup', 'destination', or stop id
   const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
-  const [routeError, setRouteError] = useState(null);
-  const profileMenuRef = useRef(null);
-  const profileButtonRef = useRef(null);
-  const pickupInputRef = useRef(null);
-  const pickupDropdownRef = useRef(null);
-  const routeCalculationTimeoutRef = useRef(null);
+  const [routeError, setRouteError] = useState<string | null>(null);
+  const [userName] = useState('Utilisateur'); // Default user name
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+  const profileButtonRef = useRef<HTMLButtonElement>(null);
+  const pickupInputRef = useRef<HTMLInputElement>(null);
+  const pickupDropdownRef = useRef<HTMLDivElement>(null);
+  const routeCalculationTimeoutRef = useRef<number | null>(null);
   const isCalculatingRef = useRef(false);
   
   // Refs for map markers
-  const pickupMarkerRef = useRef(null);
-  const destinationMarkerRef = useRef(null);
-  const stopsMarkersRef = useRef([]);
-  const pickupCoordsRef = useRef(null);
-  const destinationCoordsRef = useRef(null);
-  const routePolylineRef = useRef(null);
+  const pickupMarkerRef = useRef<any>(null);
+  const destinationMarkerRef = useRef<any>(null);
+  const stopsMarkersRef = useRef<any[]>([]);
+  const pickupCoordsRef = useRef<LocationCoords | null>(null);
+  const destinationCoordsRef = useRef<LocationCoords | null>(null);
+  const routePolylineRef = useRef<any>(null);
 
   // Obtenir la position actuelle de l'utilisateur
   useEffect(() => {
@@ -78,13 +92,13 @@ const RideBooking: React.FC = () => {
 
   // Fermer les dropdowns quand on clique en dehors
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
       // Vérifier pour le menu de profil
       if (
         profileMenuRef.current &&
         profileButtonRef.current &&
-        !profileMenuRef.current.contains(event.target) &&
-        !profileButtonRef.current.contains(event.target)
+        !profileMenuRef.current.contains(event.target as Node) &&
+        !profileButtonRef.current.contains(event.target as Node)
       ) {
         setShowProfileMenu(false);
       }
@@ -93,8 +107,8 @@ const RideBooking: React.FC = () => {
       if (
         pickupDropdownRef.current &&
         pickupInputRef.current &&
-        !pickupDropdownRef.current.contains(event.target) &&
-        !pickupInputRef.current.contains(event.target)
+        !pickupDropdownRef.current.contains(event.target as Node) &&
+        !pickupInputRef.current.contains(event.target as Node)
       ) {
         setShowPickupDropdown(false);
       }
@@ -253,7 +267,7 @@ const RideBooking: React.FC = () => {
   }, [currentLocation, currentAddress]);
 
   // Fonction pour géocoder les coordonnées en adresse
-  const reverseGeocode = async (lat, lng) => {
+  const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
@@ -279,7 +293,7 @@ const RideBooking: React.FC = () => {
   };
 
   // Fonction pour géocoder une adresse en coordonnées
-  const geocode = async (address) => {
+  const geocode = async (address: string): Promise<LocationCoords | null> => {
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
@@ -427,7 +441,7 @@ const RideBooking: React.FC = () => {
           throw new Error('Route invalide retournée par le service');
         }
 
-        const routeCoordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]); // OSRM retourne [lng, lat], Leaflet attend [lat, lng]
+        const routeCoordinates = route.geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]); // OSRM retourne [lng, lat], Leaflet attend [lat, lng]
 
         // Vérifier que la carte existe toujours avant d'ajouter la route
         if (!mapInstanceRef.current) {
@@ -471,9 +485,9 @@ const RideBooking: React.FC = () => {
       }
     } catch (error) {
       console.error('Erreur lors du calcul de la route:', error);
-      if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+      if (error instanceof Error && (error.name === 'AbortError' || error.message?.includes('aborted'))) {
         setRouteError('Le calcul de l\'itinéraire a pris trop de temps');
-      } else if (error.message) {
+      } else if (error instanceof Error && error.message) {
         setRouteError(error.message);
       } else {
         setRouteError('Erreur lors du calcul de l\'itinéraire');
@@ -488,7 +502,7 @@ const RideBooking: React.FC = () => {
   useEffect(() => {
     if (!mapInstanceRef.current || !window.L) return;
 
-    const handleMapClick = async (e) => {
+    const handleMapClick = async (e: any) => {
       if (!selectingLocation) return;
       
       const { lat, lng } = e.latlng;
@@ -706,7 +720,7 @@ const RideBooking: React.FC = () => {
     };
   }, [pickup, destination, stops, drawRoute, clearRoute]);
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Logique de recherche de prix
     const route = {
@@ -1176,7 +1190,7 @@ const RideBooking: React.FC = () => {
                     onClick={() => {
                       setStops(prev => prev.filter(s => s.id !== stop.id));
                       // Supprimer le marqueur de la carte
-                      const markerIndex = stopsMarkersRef.current.findIndex((m, i) => {
+                      const markerIndex = stopsMarkersRef.current.findIndex((_, i) => {
                         const stopIndex = stops.findIndex(s => s.id === stop.id);
                         return i === stopIndex;
                       });
