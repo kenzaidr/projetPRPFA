@@ -1,5 +1,5 @@
 // src/main/java/com/mmhk/delivery/auth/LoginRequest.java
-package com.mmhk.delivery.auth;
+package com.mmhk.delivery.features.restaurant.dto;
 
 
 public class LoginRequest {
