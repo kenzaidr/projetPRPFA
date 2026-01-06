@@ -347,7 +347,7 @@ export default function HomePage() {
                                 </p>
                                 
                                 <div className="service-cta-container flex justify-end w-full">
-                                    <button className="service-cta-button-ride text-morocco-red font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
+                                    <button onClick={() => navigate('/ride')} className="service-cta-button-ride text-morocco-red font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
                                         <span>{t('services.ride.cta')}</span>
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
