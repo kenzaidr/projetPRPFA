@@ -36,6 +36,7 @@ const RideBooking: React.FC = () => {
   const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [userName] = useState('Utilisateur'); // Default user name
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Set to true if user has an account
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const profileButtonRef = useRef<HTMLButtonElement>(null);
   const pickupInputRef = useRef<HTMLInputElement>(null);
@@ -805,204 +806,246 @@ const RideBooking: React.FC = () => {
                     padding: '20px',
                   }}
                 >
-                  {/* User Info */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                    <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#000' }}>{userName}</h3>
-                    <div style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '50%',
-                      backgroundColor: '#f3f4f6',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: '24px', height: '24px', color: '#6b7280' }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+                  {!isLoggedIn ? (
+                    <div style={{ padding: '20px', textAlign: 'center' }}>
+                      <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#000', marginBottom: '20px' }}>Vous n'avez pas encore un compte ?</h3>
+                      <p style={{ color: '#666', marginBottom: '20px' }}>Inscrivez-vous ou connectez-vous pour accéder à toutes les fonctionnalités.</p>
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <button style={{
+                          flex: 1,
+                          backgroundColor: '#006233',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          padding: '12px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          navigate('/client-login?mode=signup');
+                        }}
+                        >
+                          S'inscrire
+                        </button>
+                        <button style={{
+                          flex: 1,
+                          backgroundColor: '#C1272D',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          padding: '12px',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          navigate('/client-login?mode=login');
+                        }}
+                        >
+                          Se connecter
+                        </button>
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
-                    <button style={{
-                      flex: 1,
-                      backgroundColor: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      padding: '12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '8px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
-                    >
+                  ) : (
+                    <>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                      <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#000' }}>{userName}</h3>
                       <div style={{
-                        width: '32px',
-                        height: '32px',
+                        width: '40px',
+                        height: '40px',
                         borderRadius: '50%',
-                        backgroundColor: '#000',
+                        backgroundColor: '#f3f4f6',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
-                        <svg fill="none" stroke="white" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: '24px', height: '24px', color: '#6b7280' }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       </div>
-                      <span style={{ fontSize: '12px', fontWeight: '500', color: '#000' }}>Aide</span>
-                    </button>
-                    
-                    <button style={{
-                      flex: 1,
-                      backgroundColor: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      padding: '12px',
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+                      <button style={{
+                        flex: 1,
+                        backgroundColor: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        padding: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                      >
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: '#000',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <svg fill="none" stroke="white" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: '#000' }}>Aide</span>
+                      </button>
+                      
+                      <button style={{
+                        flex: 1,
+                        backgroundColor: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        padding: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                      >
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: '#000',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <svg fill="none" stroke="white" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          </svg>
+                        </div>
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: '#000' }}>Wallet</span>
+                      </button>
+                      
+                      <button style={{
+                        flex: 1,
+                        backgroundColor: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        padding: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                      >
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          backgroundColor: '#000',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <svg fill="none" stroke="white" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                          </svg>
+                        </div>
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: '#000' }}>Activité</span>
+                      </button>
+                    </div>
+
+                    <div style={{
                       display: 'flex',
-                      flexDirection: 'column',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
-                      gap: '8px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
-                    >
-                      <div style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        backgroundColor: '#000',
+                      padding: '16px',
+                      backgroundColor: '#f9fafb',
+                      borderRadius: '8px',
+                      marginBottom: '20px'
+                    }}>
+                      <span style={{ fontSize: '14px', fontWeight: '500', color: '#000' }}>Grab Morocco Cash</span>
+                      <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#000' }}>0,00 MAD</span>
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}>
+                      <button style={{
+                        width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <svg fill="none" stroke="white" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        gap: '12px',
+                        padding: '12px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        borderRadius: '8px',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: '20px', height: '20px', color: '#000' }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                      </div>
-                      <span style={{ fontSize: '12px', fontWeight: '500', color: '#000' }}>Wallet</span>
-                    </button>
-                    
-                    <button style={{
-                      flex: 1,
-                      backgroundColor: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      padding: '12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '8px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
-                    >
-                      <div style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        backgroundColor: '#000',
+                        <span style={{ fontSize: '14px', color: '#000' }}>Gérer le compte</span>
+                      </button>
+                      
+                      <button style={{
+                        width: '100%',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <svg fill="none" stroke="white" viewBox="0 0 24 24" style={{ width: '18px', height: '18px' }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        gap: '12px',
+                        padding: '12px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        borderRadius: '8px',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: '20px', height: '20px', color: '#000' }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                         </svg>
-                      </div>
-                      <span style={{ fontSize: '12px', fontWeight: '500', color: '#000' }}>Activité</span>
-                    </button>
-                  </div>
+                        <span style={{ fontSize: '14px', color: '#000' }}>Bonus</span>
+                      </button>
+                    </div>
 
-                  {/* Grab Morocco Cash */}
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '16px',
-                    backgroundColor: '#f9fafb',
-                    borderRadius: '8px',
-                    marginBottom: '20px'
-                  }}>
-                    <span style={{ fontSize: '14px', fontWeight: '500', color: '#000' }}>Grab Morocco Cash</span>
-                    <span style={{ fontSize: '16px', fontWeight: 'bold', color: '#000' }}>0,00 MAD</span>
-                  </div>
-
-                  {/* Account Links */}
-                  <div style={{ marginBottom: '20px' }}>
                     <button style={{
                       width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
                       padding: '12px',
-                      backgroundColor: 'transparent',
+                      backgroundColor: '#C1272D',
+                      color: 'white',
                       border: 'none',
-                      cursor: 'pointer',
                       borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
                       transition: 'background-color 0.2s'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: '20px', height: '20px', color: '#000' }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span style={{ fontSize: '14px', color: '#000' }}>Gérer le compte</span>
-                    </button>
-                    
-                    <button style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '12px',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      cursor: 'pointer',
-                      borderRadius: '8px',
-                      transition: 'background-color 0.2s'
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a01f24'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#C1272D'}
+                    onClick={() => {
+                      // Logique de déconnexion
+                      setShowProfileMenu(false);
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ width: '20px', height: '20px', color: '#000' }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                      </svg>
-                      <span style={{ fontSize: '14px', color: '#000' }}>Bonus</span>
+                      Se déconnecter
                     </button>
-                  </div>
-
-                  {/* Logout Button */}
-                  <button style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: '#C1272D',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a01f24'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#C1272D'}
-                  onClick={() => {
-                    // Logique de déconnexion
-                    setShowProfileMenu(false);
-                  }}
-                  >
-                    Se déconnecter
-                  </button>
+                    </>
+                  )}
                 </div>
               )}
             </div>

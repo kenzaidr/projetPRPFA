@@ -10,6 +10,7 @@ import VerificationPage from './pages/VerificationPage';
 import Restaurant from './features/restaurant/src/pages/Food.tsx';
 import Ride from './features/driver/driveCustumor.tsx';
 import RideBooking from './features/ride/ride.tsx';
+import ClientLogin from './pages/ClientLogin';
 
 const App: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const App: React.FC = () => {
         <Route path="/ride" element={<Ride />} />
         <Route path="/restaurant" element={<Restaurant />} />
         <Route path="/ride/booking" element={<RideBooking />} />
+        <Route path="/client-login" element={<ClientLogin />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </HashRouter>
