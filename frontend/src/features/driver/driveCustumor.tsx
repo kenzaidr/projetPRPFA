@@ -292,7 +292,7 @@ const Ride: React.FC = () => {
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
   const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
-  
+  const [locationSuggestions, setLocationSuggestions] = useState<Array<{ address: string; city: string }>>([]);
 
   // Fonction de traduction
   const t = (key: string): string => {
