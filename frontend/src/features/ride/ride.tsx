@@ -12,31 +12,10 @@ const RideBooking: React.FC = () => {
   // Récupérer les données du formulaire précédent si disponibles
   const [pickup, setPickup] = useState(location.state?.pickup || '');
   const [destination, setDestination] = useState(location.state?.destination || '');
-  const [scheduleType, setScheduleType] = useState(location.state?.scheduleType || 'immediate');
   const [passengerType, setPassengerType] = useState('me');
   
-  // User state
-  const [userName, setUserName] = useState(() => {
-    // Récupérer le nom de l'utilisateur depuis localStorage ou sessionStorage
-    return localStorage.getItem('userName') || 
-           sessionStorage.getItem('userName') || 
-           location.state?.userName || 
-           'Utilisateur';
-  });
-  
-  const [showPassengerDropdown, setShowPassengerDropdown] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showPickupDropdown, setShowPickupDropdown] = useState(false);
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [tripType, setTripType] = useState('pickup'); // 'pickup' or 'arrival'
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
-  const [selectedTime, setSelectedTime] = useState(() => {
-    const now = new Date();
-    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  });
   const [currentLocation, setCurrentLocation] = useState(null);
   const [currentAddress, setCurrentAddress] = useState('');
   const [stops, setStops] = useState([]); // Array of { id, address, lat, lng }
@@ -100,11 +79,6 @@ const RideBooking: React.FC = () => {
   // Fermer les dropdowns quand on clique en dehors
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Vérifier pour le dropdown de passenger
-      if (!event.target.closest('.dropdown-wrapper')) {
-        setShowPassengerDropdown(false);
-      }
-      
       // Vérifier pour le menu de profil
       if (
         profileMenuRef.current &&
@@ -739,7 +713,6 @@ const RideBooking: React.FC = () => {
       pickup,
       destination,
       stops: stops.filter(stop => stop.address && stop.lat && stop.lng),
-      scheduleType,
       passengerType
     };
     console.log('Recherche de prix:', route);
@@ -1054,11 +1027,9 @@ const RideBooking: React.FC = () => {
                   onChange={(e) => setPickup(e.target.value)}
                   onFocus={() => {
                     setShowPickupDropdown(true);
-                    setShowPassengerDropdown(false);
                   }}
                   onClick={() => {
                     setShowPickupDropdown(true);
-                    setShowPassengerDropdown(false);
                   }}
                   required
                 />
@@ -1227,31 +1198,6 @@ const RideBooking: React.FC = () => {
               </div>
             ))}
 
-            {/* Schedule Type */}
-            <div className="form-field">
-              <label className="field-label">
-                <svg className="field-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </label>
-              <div className="dropdown-wrapper">
-                <button
-                  type="button"
-                  className="dropdown-button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // Ouvrir directement la modal de planification
-                    setShowScheduleModal(true);
-                    setShowPassengerDropdown(false);
-                    setShowPickupDropdown(false);
-                  }}
-                >
-                  <span>{scheduleType === 'immediate' ? 'Prise en charge immédiate' : 'Planifier plus tard'}</span>
-                </button>
-              </div>
-            </div>
-
             
 
             {/* Search Button */}
@@ -1354,188 +1300,6 @@ const RideBooking: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* Modal de planification de la prise en charge */}
-      {showScheduleModal && (
-        <div className="schedule-modal-overlay" onClick={() => setShowScheduleModal(false)}>
-          <div className="schedule-modal-content" onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div className="schedule-modal-header">
-              <button 
-                className="schedule-modal-back-btn"
-                onClick={() => setShowScheduleModal(false)}
-                aria-label="Retour"
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button 
-                className="schedule-modal-clear-btn"
-                onClick={() => {
-                  setSelectedDate('');
-                  setSelectedTime('');
-                  setTripType('pickup');
-                }}
-              >
-                Effacer
-              </button>
-            </div>
-
-            {/* Title */}
-            <h2 className="schedule-modal-title">Quand voulez-vous être pris en charge?</h2>
-
-            {/* Pickup Location Display */}
-            {pickup && (
-              <div className="schedule-modal-location">
-                Prise en charge : {pickup}
-              </div>
-            )}
-
-            {/* Trip Type Toggle */}
-            <div className="schedule-modal-trip-type">
-              <button
-                type="button"
-                className={`trip-type-btn ${tripType === 'pickup' ? 'trip-type-btn-active' : ''}`}
-                onClick={() => setTripType('pickup')}
-              >
-                Prise en charge à
-              </button>
-              <button
-                type="button"
-                className={`trip-type-btn ${tripType === 'arrival' ? 'trip-type-btn-active' : ''}`}
-                onClick={() => setTripType('arrival')}
-              >
-                Arrivée à destination d'ici
-              </button>
-            </div>
-
-            {/* Date Selection */}
-            <div className="schedule-modal-date-time">
-              <button
-                type="button"
-                className="date-time-input"
-                onClick={() => {
-                  const input = document.createElement('input');
-                  input.type = 'date';
-                  input.min = new Date().toISOString().split('T')[0];
-                  input.max = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                  input.value = selectedDate || new Date().toISOString().split('T')[0];
-                  input.onchange = (e) => {
-                    const date = new Date(e.target.value);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    if (date >= today) {
-                      setSelectedDate(e.target.value);
-                    }
-                  };
-                  input.click();
-                }}
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="date-time-icon">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span className="date-time-text">
-                  {selectedDate 
-                    ? (() => {
-                        const date = new Date(selectedDate);
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        const tomorrow = new Date(today);
-                        tomorrow.setDate(tomorrow.getDate() + 1);
-                        
-                        if (date.getTime() === today.getTime()) {
-                          return 'Aujourd\'hui';
-                        } else if (date.getTime() === tomorrow.getTime()) {
-                          return 'Demain';
-                        } else {
-                          return date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-                        }
-                      })()
-                    : 'Aujourd\'hui'}
-                </span>
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="date-time-chevron">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {/* Time Selection */}
-              <button
-                type="button"
-                className="date-time-input"
-                onClick={() => {
-                  const input = document.createElement('input');
-                  input.type = 'time';
-                  const now = new Date();
-                  const hours = String(now.getHours()).padStart(2, '0');
-                  const minutes = String(now.getMinutes()).padStart(2, '0');
-                  input.value = selectedTime || `${hours}:${minutes}`;
-                  input.onchange = (e) => {
-                    setSelectedTime(e.target.value);
-                  };
-                  input.click();
-                }}
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="date-time-icon">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="date-time-text">
-                  {selectedTime 
-                    ? (() => {
-                        const [hours, minutes] = selectedTime.split(':');
-                        return `${hours}:${minutes}`;
-                      })()
-                    : 'Maintenant'}
-                </span>
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="date-time-chevron">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Features List */}
-            <div className="schedule-modal-features">
-              <div className="schedule-feature-item">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="feature-icon">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span className="feature-text">Choisissez une heure de prise en charge jusqu'à 30 jours à l'avance</span>
-              </div>
-              <div className="schedule-feature-item">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="feature-icon">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="feature-text">Temps d'attente supplémentaire inclus pour aller retrouver votre course</span>
-              </div>
-              <div className="schedule-feature-item">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="feature-icon">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                <span className="feature-text">Annulez sans frais jusqu'à 60 minutes à l'avance</span>
-              </div>
-            </div>
-
-            {/* Terms Link */}
-            <button className="schedule-modal-terms-link">
-              Consulter les conditions
-            </button>
-
-            {/* Next Button */}
-            <button
-              type="button"
-              className="schedule-modal-next-btn"
-              onClick={() => {
-                // Toujours définir le type de planification sur "later" quand on confirme
-                setScheduleType('later');
-                setShowScheduleModal(false);
-                // Les valeurs de date et heure sont déjà dans le state
-              }}
-            >
-              Suivant
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
