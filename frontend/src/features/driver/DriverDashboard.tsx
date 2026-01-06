@@ -4,8 +4,9 @@ import {
   Navigation, User, Settings, LogOut, ChevronRight
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { RideRequest, DriverStats } from '../../types';
+import type { RideRequest } from '../../types';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { driverService, type DriverStatsResponse } from '../../services/driverService';
 
 // Define Leaflet on window
 declare global {
@@ -13,14 +14,6 @@ declare global {
     L: any;
   }
 }
-
-// Mock Data
-const MOCK_STATS: DriverStats = {
-  todayEarnings: 450.50,
-  totalRides: 12,
-  onlineHours: 5.5,
-  acceptanceRate: 98
-};
 
 const MOCK_REQUEST: RideRequest = {
   id: 'req_123',
@@ -55,12 +48,45 @@ export default function DriverDashboard() {
   const [incomingRequest, setIncomingRequest] = useState<RideRequest | null>(null);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null); // [lat, lng]
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [stats, setStats] = useState<DriverStatsResponse | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
 
   // Map Refs
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const driverMarkerRef = useRef<any>(null);
   const watchIdRef = useRef<number | null>(null);
+
+  // Fetch Driver Stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      const driverId = parseInt(localStorage.getItem('driverId') || '0');
+      if (!driverId) {
+        setStatsError('Driver ID not found. Please login again.');
+        setStatsLoading(false);
+        return;
+      }
+
+      try {
+        setStatsLoading(true);
+        setStatsError(null);
+        const data = await driverService.getStats(driverId);
+        setStats(data);
+        // Sync online status from backend
+        if (data.isOnline !== undefined) {
+          setIsOnline(data.isOnline);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        setStatsError('Failed to load driver statistics');
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   // Get User's Current Location
   useEffect(() => {
@@ -230,7 +256,22 @@ export default function DriverDashboard() {
     return () => clearTimeout(timeout);
   }, [isOnline]);
 
-  const toggleOnline = () => setIsOnline(!isOnline);
+  const toggleOnline = async () => {
+    const driverId = parseInt(localStorage.getItem('driverId') || '0');
+    if (!driverId) {
+      alert('Driver ID not found. Please login again.');
+      return;
+    }
+
+    const newStatus = !isOnline;
+    try {
+      await driverService.updateStatus(driverId, newStatus);
+      setIsOnline(newStatus);
+    } catch (error) {
+      console.error('Error updating status:', error);
+      alert('Failed to update online status');
+    }
+  };
 
   const NavItem = ({ id, icon: Icon, label }: { id: typeof activeTab, icon: any, label: string }) => (
     <button
@@ -336,7 +377,17 @@ export default function DriverDashboard() {
                       <DollarSign size={18} />
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-gray-800">{MOCK_STATS.todayEarnings} <span className="text-sm font-medium text-gray-500">MAD</span></div>
+                  <div className="text-2xl font-bold text-gray-800">
+                    {statsLoading ? (
+                      <span className="text-gray-400">Loading...</span>
+                    ) : statsError ? (
+                      <span className="text-red-500 text-sm">Error</span>
+                    ) : (
+                      <>
+                        {stats?.todayEarnings?.toFixed(2) || '0.00'} <span className="text-sm font-medium text-gray-500">MAD</span>
+                      </>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
@@ -346,7 +397,15 @@ export default function DriverDashboard() {
                       <Car size={18} />
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-gray-800">{MOCK_STATS.totalRides}</div>
+                  <div className="text-2xl font-bold text-gray-800">
+                    {statsLoading ? (
+                      <span className="text-gray-400">Loading...</span>
+                    ) : statsError ? (
+                      <span className="text-red-500 text-sm">Error</span>
+                    ) : (
+                      stats?.totalRides || 0
+                    )}
+                  </div>
                 </div>
 
                 <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
@@ -356,7 +415,15 @@ export default function DriverDashboard() {
                       <Clock size={18} />
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-gray-800">{MOCK_STATS.onlineHours}h</div>
+                  <div className="text-2xl font-bold text-gray-800">
+                    {statsLoading ? (
+                      <span className="text-gray-400">Loading...</span>
+                    ) : statsError ? (
+                      <span className="text-red-500 text-sm">Error</span>
+                    ) : (
+                      `${stats?.onlineHours?.toFixed(1) || '0.0'}h`
+                    )}
+                  </div>
                 </div>
 
                 <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
@@ -366,7 +433,15 @@ export default function DriverDashboard() {
                       <Star size={18} />
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-gray-800">4.9</div>
+                  <div className="text-2xl font-bold text-gray-800">
+                    {statsLoading ? (
+                      <span className="text-gray-400">Loading...</span>
+                    ) : statsError ? (
+                      <span className="text-red-500 text-sm">Error</span>
+                    ) : (
+                      stats?.rating?.toFixed(1) || '0.0'
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -500,7 +575,15 @@ export default function DriverDashboard() {
                   <div className="flex justify-between items-end mb-6">
                     <div>
                       <h2 className="text-lg text-gray-500 mb-1">Total Earnings (Today)</h2>
-                      <div className="text-4xl font-bold text-gray-900">{MOCK_STATS.todayEarnings.toFixed(2)} MAD</div>
+                      <div className="text-4xl font-bold text-gray-900">
+                        {statsLoading ? (
+                          <span className="text-gray-400">Loading...</span>
+                        ) : statsError ? (
+                          <span className="text-red-500">Error loading earnings</span>
+                        ) : (
+                          `${stats?.todayEarnings?.toFixed(2) || '0.00'} MAD`
+                        )}
+                      </div>
                     </div>
                     <select className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-morocco-green/50">
                       <option>Today</option>

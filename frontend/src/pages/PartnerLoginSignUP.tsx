@@ -111,6 +111,7 @@ const PartnerLoginSignUP: React.FC = () => {
     agreedToTerms: false
   });
   const [errors, setErrors] = useState<Partial<Record<keyof PartnerRegistrationData, string>>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const t = (key: string) => getTranslation(key, currentLang);
   const config = languageConfig[currentLang];
@@ -208,22 +209,61 @@ const PartnerLoginSignUP: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSignupSubmit = (e: React.FormEvent) => {
+  const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateSignup()) {
-      setIsLoadingSignup(true);
-      setTimeout(() => {
+    setSubmitError(null);
+    
+    if (!validateSignup()) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Only handle driver registration for now
+    if (formData.partnerType !== 'driver') {
+      setSubmitError('Restaurant registration is not yet implemented');
+      return;
+    }
+
+    setIsLoadingSignup(true);
+
+    try {
+      const { driverService } = await import('../services/driverService');
+      
+      const registerData = {
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        vehicleModel: formData.vehicleModel || '',
+        licensePlate: formData.licensePlate || '',
+        vehicleColor: formData.vehicleType || 'car'
+      };
+
+      const response = await driverService.register(registerData);
+      
+      if (response.driverId) {
+        // Store driver ID for later login
+        localStorage.setItem('driverId', response.driverId.toString());
+        localStorage.setItem('driverEmail', response.email);
+        
+        // Navigate to verification page for document upload
+        navigate('/driver/verification', {
+          state: {
+            message: 'Registration successful! Please upload your documents.',
+            email: response.email,
+            driverId: response.driverId
+          }
+        });
+      } else {
+        setSubmitError(response.message || 'Registration failed');
         setIsLoadingSignup(false);
-        // Navigate to verification page only for drivers
-        if (formData.partnerType === 'driver') {
-          navigate('/driver/verification');
-        } else {
-          // For restaurants, go directly to dashboard
-          navigate('/driver');
-        }
-      }, 2000);
-    } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      setSubmitError(error.message || 'Registration failed. Please try again.');
+      setIsLoadingSignup(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -453,6 +493,14 @@ const PartnerLoginSignUP: React.FC = () => {
                   </h1>
                   <p className="partner-auth-signup-subtitle text-gray-600 text-sm">{t('auth.signup.subtitle')}</p>
                 </div>
+
+                {/* Error Message Display */}
+                {submitError && (
+                  <div className={`partner-auth-error-alert mb-4 p-4 rounded-xl bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-200/50 flex items-start gap-3 shadow-lg animate-in slide-in-from-top-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={20} />
+                    <span className={`text-sm text-red-700 font-medium ${isRTL ? 'text-right' : 'text-left'}`}>{submitError}</span>
+                  </div>
+                )}
 
                 <form onSubmit={handleSignupSubmit}>
                   {/* Partner Type Selection */}
