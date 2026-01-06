@@ -1,8 +1,10 @@
 package com.mmhk.delivery.features.restaurant.service;
 
+import com.mmhk.delivery.features.restaurant.dto.OrderItemRequest;
 import com.mmhk.delivery.features.restaurant.dto.OrderRequest;
 import com.mmhk.delivery.features.restaurant.model.Order;
 import com.mmhk.delivery.features.restaurant.repository.OrderRepository;
+import com.mmhk.delivery.features.restaurant.repository.RestaurantRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,41 +15,50 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final RestaurantRepository restaurantRepository; // ⬅️ AJOUTEZ
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, RestaurantRepository restaurantRepository) {
         this.orderRepository = orderRepository;
+        this.restaurantRepository = restaurantRepository;
     }
 
-    // POST - CRÉER COMMANDE (votre code existant)
     @Transactional
     public void createOrder(OrderRequest dto, String authHeader) {
         try {
             System.out.println("🛠️ OrderService.createOrder() START");
-            System.out.println("DTO received: " + dto);
 
-            // Validation
+            // Afficher TOUS les champs
+            System.out.println("=== DTO REÇU ===");
+            System.out.println("restaurantId: " + dto.getRestaurantId());
+            System.out.println("deliveryAddress: " + dto.getDeliveryAddress());
+            System.out.println("phone: " + dto.getPhone());
+            System.out.println("modePaiement: " + dto.getModePaiement());
+            System.out.println("codePromo: " + dto.getCodePromo());
+            System.out.println("instructions: " + dto.getInstructions());
+            System.out.println("totalAmount: " + dto.getTotalAmount());
+
+            // Afficher les items
+            System.out.println("Items (" + dto.getItems().size() + "):");
+            for (OrderItemRequest item : dto.getItems()) {
+                System.out.println("  - menuItemId: " + item.getMenuItemId() +
+                        ", quantity: " + item.getQuantity());
+            }
+            System.out.println("================");
+
+            // ✅ AJOUTEZ CETTE VÉRIFICATION IMPORTANTE
             if (dto.getRestaurantId() == null) {
                 throw new IllegalArgumentException("restaurantId est obligatoire");
             }
-            if (dto.getDeliveryAddress() == null || dto.getDeliveryAddress().trim().isEmpty()) {
-                throw new IllegalArgumentException("deliveryAddress est obligatoire");
-            }
-            if (dto.getPhone() == null || dto.getPhone().trim().isEmpty()) {
-                throw new IllegalArgumentException("phone est obligatoire");
-            }
-            if (dto.getTotalAmount() == null || dto.getTotalAmount() <= 0) {
-                throw new IllegalArgumentException("totalAmount doit être positif");
-            }
-            if (dto.getModePaiement() == null || dto.getModePaiement().trim().isEmpty()) {
-                throw new IllegalArgumentException("modePaiement est obligatoire");
-            }
 
-            // Log
-            System.out.println("✅ Validation passed:");
-            System.out.println("  - restaurantId: " + dto.getRestaurantId());
-            System.out.println("  - deliveryAddress: " + dto.getDeliveryAddress());
-            System.out.println("  - phone: " + dto.getPhone());
-            System.out.println("  - totalAmount: " + dto.getTotalAmount());
+            // ✅ VÉRIFIEZ QUE LE RESTAURANT EXISTE
+            System.out.println("🔍 Vérification du restaurant ID: " + dto.getRestaurantId());
+            boolean restaurantExists = restaurantRepository.existsById(dto.getRestaurantId());
+            System.out.println("🔍 Restaurant existe ? " + restaurantExists);
+
+            if (!restaurantExists) {
+                throw new IllegalArgumentException("Restaurant non trouvé avec ID: " + dto.getRestaurantId() +
+                        ". Vérifiez que le restaurant existe dans la base de données.");
+            }
 
             // Création
             Order order = new Order();
