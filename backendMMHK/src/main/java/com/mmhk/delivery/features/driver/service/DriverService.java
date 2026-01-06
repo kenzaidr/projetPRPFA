@@ -3,8 +3,8 @@ package com.mmhk.delivery.features.driver.service;
 import com.mmhk.delivery.features.driver.dto.*;
 import com.mmhk.delivery.features.driver.model.Driver;
 import com.mmhk.delivery.features.driver.repository.DriverRepository;
-import com.mmhk.delivery.features.restaurant.model.Order;
-import com.mmhk.delivery.features.restaurant.repository.OrderRepository;
+import com.mmhk.delivery.features.driver.model.DriverOrder;
+import com.mmhk.delivery.features.driver.repository.DriverOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class DriverService {
     private DriverRepository driverRepository;
 
     @Autowired
-    private OrderRepository orderRepository;
+    private DriverOrderService driverOrderService;
 
     // LOGIN
     public DriverLoginResponse login(DriverLoginRequest request) {
@@ -149,8 +149,23 @@ public class DriverService {
     }
 
     // GET DRIVER ORDERS (orders assigned to this driver)
-    public List<Order> getDriverOrders(Long driverId) {
-        return orderRepository.findByDriverId(driverId);
+    public List<DriverOrder> getDriverOrders(Long driverId) {
+        return driverOrderService.getDriverOrders(driverId);
+    }
+
+    // GET AVAILABLE ORDERS (pending orders without a driver)
+    public List<DriverOrder> getAvailableOrders() {
+        return driverOrderService.getAvailableOrders();
+    }
+
+    // ACCEPT ORDER (assign driver to order)
+    public DriverOrder acceptOrder(Long driverId, Long orderId) {
+        return driverOrderService.acceptOrder(driverId, orderId);
+    }
+
+    // COMPLETE ORDER (mark order as completed)
+    public DriverOrder completeOrder(Long driverId, Long orderId) {
+        return driverOrderService.completeOrder(driverId, orderId);
     }
 
     // VALIDATE TOKEN
@@ -183,8 +198,16 @@ public class DriverService {
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(23, 59, 59);
         
-        List<Order> todayOrders = orderRepository.findByDriverIdAndOrderDateBetween(
-                driverId, startOfDay, endOfDay);
+        List<DriverOrder> allOrders = driverOrderService.getDriverOrders(driverId);
+        
+        // Filter orders from today
+        List<DriverOrder> todayOrders = allOrders.stream()
+                .filter(order -> {
+                    if (order.getOrderDate() == null) return false;
+                    LocalDateTime orderDate = order.getOrderDate();
+                    return !orderDate.isBefore(startOfDay) && !orderDate.isAfter(endOfDay);
+                })
+                .collect(java.util.stream.Collectors.toList());
 
         // Sum up earnings (assuming a commission or delivery fee)
         // 10% commission example - adjust based on your business logic

@@ -2,7 +2,8 @@ package com.mmhk.delivery.features.driver.controller;
 
 import com.mmhk.delivery.features.driver.dto.*;
 import com.mmhk.delivery.features.driver.service.DriverService;
-import com.mmhk.delivery.features.restaurant.model.Order;
+import com.mmhk.delivery.features.driver.service.DriverOrderService;
+import com.mmhk.delivery.features.driver.model.DriverOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ public class DriverController {
 
     @Autowired
     private DriverService driverService;
+
+    @Autowired
+    private DriverOrderService driverOrderService;
 
     // DRIVER LOGIN
     @PostMapping("/login")
@@ -96,12 +100,70 @@ public class DriverController {
 
     // GET DRIVER ORDERS
     @GetMapping("/{driverId}/orders")
-    public ResponseEntity<List<Order>> getDriverOrders(@PathVariable Long driverId) {
+    public ResponseEntity<List<DriverOrder>> getDriverOrders(@PathVariable Long driverId) {
         try {
-            List<Order> orders = driverService.getDriverOrders(driverId);
+            List<DriverOrder> orders = driverService.getDriverOrders(driverId);
             return ResponseEntity.ok(orders);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    // GET AVAILABLE ORDERS (pending orders without driver)
+    @GetMapping("/available-orders")
+    public ResponseEntity<List<DriverOrder>> getAvailableOrders() {
+        try {
+            System.out.println("Fetching available driver orders...");
+            List<DriverOrder> orders = driverService.getAvailableOrders();
+            System.out.println("Returning " + orders.size() + " available driver orders");
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            System.err.println("Error fetching available orders: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    // ACCEPT ORDER
+    @PostMapping("/{driverId}/orders/{orderId}/accept")
+    @CrossOrigin(origins = "http://localhost:5173", methods = {RequestMethod.POST, RequestMethod.OPTIONS}, allowedHeaders = "*")
+    public ResponseEntity<?> acceptOrder(
+            @PathVariable Long driverId,
+            @PathVariable Long orderId) {
+        try {
+            DriverOrder order = driverService.acceptOrder(driverId, orderId);
+            return ResponseEntity.ok(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to accept order: " + e.getMessage());
+        }
+    }
+
+    // COMPLETE ORDER
+    @PostMapping("/{driverId}/orders/{orderId}/complete")
+    @CrossOrigin(origins = "http://localhost:5173", methods = {RequestMethod.POST, RequestMethod.OPTIONS}, allowedHeaders = "*")
+    public ResponseEntity<?> completeOrder(
+            @PathVariable Long driverId,
+            @PathVariable Long orderId) {
+        try {
+            DriverOrder order = driverService.completeOrder(driverId, orderId);
+            return ResponseEntity.ok(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to complete order: " + e.getMessage());
+        }
+    }
+
+    // CREATE TEST ORDER (for testing)
+    @PostMapping("/create-test-order")
+    public ResponseEntity<?> createTestOrder() {
+        try {
+            DriverOrder testOrder = driverOrderService.createTestOrder();
+            return ResponseEntity.ok(testOrder);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
 
@@ -124,5 +186,6 @@ public class DriverController {
         return ResponseEntity.ok("Driver API is working!");
     }
 }
+
 
 

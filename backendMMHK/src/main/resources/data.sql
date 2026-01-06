@@ -23,8 +23,8 @@ INSERT INTO drivers (
     'White',
     true,
     'ACTIVE',
-    33.5731,  -- Casablanca latitude
-    -7.5898,  -- Casablanca longitude
+    34.0372,  -- Fes latitude
+    -4.9998,  -- Fes longitude
     4.8,
     45,
     2250.50,
@@ -53,8 +53,8 @@ INSERT INTO drivers (
     'Blue',
     false,
     'INACTIVE',
-    33.5731,
-    -7.5898,
+    34.0372,
+    -4.9998,
     4.9,
     78,
     3890.25,
@@ -83,8 +83,8 @@ INSERT INTO drivers (
     'Red',
     true,
     'ACTIVE',
-    33.5731,
-    -7.5898,
+    34.0372,
+    -4.9998,
     4.7,
     32,
     1680.75,
@@ -105,10 +105,10 @@ INSERT INTO orders (
     restaurant_id, driver_id, delivery_address, phone,
     total_amount, status, order_date, instructions, mode_paiement
 ) VALUES 
-    (1, 1, '123 Boulevard Mohammed V, Casablanca', '+212612000001', 150.00, 'COMPLETED', CURRENT_DATE + TIME '08:30:00', '', 'CASH'),
-    (1, 1, '456 Avenue Hassan II, Casablanca', '+212612000002', 85.50, 'COMPLETED', CURRENT_DATE + TIME '10:15:00', '', 'CARD'),
-    (1, 1, '789 Rue Zerktouni, Casablanca', '+212612000003', 120.00, 'COMPLETED', CURRENT_DATE + TIME '12:45:00', '', 'CASH'),
-    (1, 1, '321 Boulevard Anfa, Casablanca', '+212612000004', 95.75, 'COMPLETED', CURRENT_DATE + TIME '14:20:00', '', 'CARD')
+    (1, 1, '123 Boulevard Mohammed V, Fes', '+212612000001', 150.00, 'COMPLETED', CURRENT_DATE + TIME '08:30:00', '', 'CASH'),
+    (1, 1, '456 Avenue Hassan II, Fes', '+212612000002', 85.50, 'COMPLETED', CURRENT_DATE + TIME '10:15:00', '', 'CARD'),
+    (1, 1, '789 Rue Zerktouni, Fes', '+212612000003', 120.00, 'COMPLETED', CURRENT_DATE + TIME '12:45:00', '', 'CASH'),
+    (1, 1, '321 Boulevard Anfa, Fes', '+212612000004', 95.75, 'COMPLETED', CURRENT_DATE + TIME '14:20:00', '', 'CARD')
 ON CONFLICT DO NOTHING;
 
 -- Orders for Driver 2 (Fatima) - Today
@@ -118,9 +118,9 @@ INSERT INTO orders (
     restaurant_id, driver_id, delivery_address, phone,
     total_amount, status, order_date, instructions, mode_paiement
 ) VALUES 
-    (1, 2, '111 Avenue des FAR, Casablanca', '+212612000005', 200.00, 'COMPLETED', CURRENT_DATE + TIME '09:00:00', '', 'CARD'),
-    (1, 2, '222 Boulevard Zerktouni, Casablanca', '+212612000006', 175.50, 'COMPLETED', CURRENT_DATE + TIME '11:30:00', '', 'CASH'),
-    (1, 2, '333 Rue Oued El Makhazine, Casablanca', '+212612000007', 140.25, 'COMPLETED', CURRENT_DATE + TIME '13:15:00', '', 'CARD')
+    (1, 2, '111 Avenue des FAR, Fes', '+212612000005', 200.00, 'COMPLETED', CURRENT_DATE + TIME '09:00:00', '', 'CARD'),
+    (1, 2, '222 Boulevard Zerktouni, Fes', '+212612000006', 175.50, 'COMPLETED', CURRENT_DATE + TIME '11:30:00', '', 'CASH'),
+    (1, 2, '333 Rue Oued El Makhazine, Fes', '+212612000007', 140.25, 'COMPLETED', CURRENT_DATE + TIME '13:15:00', '', 'CARD')
 ON CONFLICT DO NOTHING;
 
 -- Orders for Driver 3 (Youssef) - Today
@@ -130,8 +130,40 @@ INSERT INTO orders (
     restaurant_id, driver_id, delivery_address, phone,
     total_amount, status, order_date, instructions, mode_paiement
 ) VALUES 
-    (1, 3, '444 Boulevard Moulay Youssef, Casablanca', '+212612000008', 180.00, 'COMPLETED', CURRENT_DATE + TIME '09:45:00', '', 'CASH'),
-    (1, 3, '555 Avenue Lalla Yeddouna, Casablanca', '+212612000009', 95.00, 'COMPLETED', CURRENT_DATE + TIME '11:00:00', '', 'CARD'),
-    (1, 3, '666 Rue Allal Ben Abdellah, Casablanca', '+212612000010', 110.50, 'COMPLETED', CURRENT_DATE + TIME '15:30:00', '', 'CASH')
+    (1, 3, '444 Boulevard Moulay Youssef, Fes', '+212612000008', 180.00, 'COMPLETED', CURRENT_DATE + TIME '09:45:00', '', 'CASH'),
+    (1, 3, '555 Avenue Lalla Yeddouna, Fes', '+212612000009', 95.00, 'COMPLETED', CURRENT_DATE + TIME '11:00:00', '', 'CARD'),
+    (1, 3, '666 Rue Allal Ben Abdellah, Fes', '+212612000010', 110.50, 'COMPLETED', CURRENT_DATE + TIME '15:30:00', '', 'CASH')
 ON CONFLICT DO NOTHING;
+
+-- Insert a test PENDING order (without driver) for drivers to accept
+-- This order will appear when drivers go online
+-- Using a WHERE NOT EXISTS to avoid duplicates
+INSERT INTO orders (
+    restaurant_id, driver_id, delivery_address, phone,
+    total_amount, status, order_date, instructions, mode_paiement
+)
+SELECT 1, NULL, 'Fes Medina, Fes', '+212612345678', 125.50, 'PENDING', CURRENT_TIMESTAMP, 'Please ring the doorbell', 'CASH'
+WHERE NOT EXISTS (
+    SELECT 1 FROM orders 
+    WHERE delivery_address = 'Fes Medina, Fes' 
+    AND status = 'PENDING' 
+    AND driver_id IS NULL
+    LIMIT 1
+);
+
+-- Insert a test PENDING driver order (without driver) for drivers to accept
+-- This order will appear when drivers go online in the driver dashboard
+-- Using distinct locations: Train Station (Ville Nouvelle) and Medina (Old City)
+INSERT INTO driver_orders (
+    user_id, driver_id, pickup_address, delivery_address, phone,
+    total_amount, status, order_date, instructions, mode_paiement
+)
+SELECT 1, NULL, 'Gare Fes-Ville, Avenue Mohammed V, Fes', 'Bab Boujloud, Fes Medina, Fes', '+212612345678', 125.50, 'PENDING', CURRENT_TIMESTAMP, 'Please ring the doorbell', 'CASH'
+WHERE NOT EXISTS (
+    SELECT 1 FROM driver_orders 
+    WHERE delivery_address = 'Bab Boujloud, Fes Medina, Fes' 
+    AND status = 'PENDING' 
+    AND driver_id IS NULL
+    LIMIT 1
+);
 
