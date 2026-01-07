@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   ChevronDown, 
   Mail, 
@@ -10,7 +10,8 @@ import {
   AlertCircle,
   Loader2,
   Briefcase,
-  Sparkles
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
 import { 
   languageConfig, 
@@ -19,9 +20,11 @@ import {
   setLanguage, 
   type Language 
 } from '../utils/translations';
+import { driverService } from '../services/driverService';
 
 const DriverLogin: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentLang, setCurrentLangState] = useState<Language>(getCurrentLanguage());
   const [showLangMenu, setShowLangMenu] = useState(false);
   
@@ -30,6 +33,19 @@ const DriverLogin: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Check for registration success message
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      if (location.state.email) {
+        setEmail(location.state.email);
+      }
+      // Clear the state to prevent showing message on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const t = (key: string) => getTranslation(key, currentLang);
   const config = languageConfig[currentLang];
@@ -59,10 +75,29 @@ const DriverLogin: React.FC = () => {
       return;
     }
 
-    setTimeout(() => {
+    try {
+      const response = await driverService.login(email, password);
+      
+      if (response.token && response.driverId) {
+        // Store authentication data
+        localStorage.setItem('driverToken', response.token);
+        localStorage.setItem('driverId', response.driverId.toString());
+        localStorage.setItem('driverName', response.name || '');
+        localStorage.setItem('driverEmail', response.email);
+        
+        // Navigate to dashboard
+        navigate('/driver');
+      } else {
+        setError(response.message || t('auth.error.invalidCredentials'));
+        setIsLoading(false);
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      // Show user-friendly error message
+      const errorMessage = error.message || t('auth.error.invalidCredentials');
+      setError(errorMessage);
       setIsLoading(false);
-      navigate('/driver');
-    }, 1500);
+    }
   };
 
   return (
@@ -149,6 +184,13 @@ const DriverLogin: React.FC = () => {
               <p className="login-subtitle text-gray-600 text-lg">{t('auth.login.subtitle')}</p>
             </div>
 
+            {successMessage && (
+              <div className={`login-success-alert mb-6 p-4 rounded-2xl bg-gradient-to-r from-green-50 to-green-100/50 border-2 border-green-200/50 flex items-start gap-3 shadow-lg animate-in slide-in-from-top-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <CheckCircle2 className="text-green-500 shrink-0 mt-0.5" size={20} />
+                <span className={`text-sm text-green-700 font-medium ${isRTL ? 'text-right' : 'text-left'}`}>{successMessage}</span>
+              </div>
+            )}
+            
             {error && (
               <div className={`login-error-alert mb-6 p-4 rounded-2xl bg-gradient-to-r from-red-50 to-red-100/50 border-2 border-red-200/50 flex items-start gap-3 shadow-lg animate-in slide-in-from-top-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={20} />
