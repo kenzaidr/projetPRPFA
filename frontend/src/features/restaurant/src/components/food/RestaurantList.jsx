@@ -88,7 +88,13 @@ function RestaurantList({restaurants, favorites, onSelectRestaurant, onToggleFav
           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
           gap: 1.5rem;
         }
+ @media screen and (max-width: 480px){
+      .restaurant-list{
+      display:none;
+      }
+      
 
+ }
         .restaurant-card {
           background: #fff;
           border-radius: 16px;
