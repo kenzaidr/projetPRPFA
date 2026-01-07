@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class MmhkDeliveryBackendApplication {
     public static void main(String[] args) {
         SpringApplication.run(MmhkDeliveryBackendApplication.class, args);
-        System.out.println("✅ Server started on http://localhost:8080");
+        System.out.println(" Server started on http://localhost:8080");
 
     }
 }
