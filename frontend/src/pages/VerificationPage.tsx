@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, CheckCircle, AlertCircle, Scan, Calendar, FileText, ShieldCheck, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, Calendar, FileText, ShieldCheck, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 
 type DocumentStatus = 'empty' | 'scanning' | 'verified' | 'error';

@@ -42,7 +42,7 @@ export default function Food() {
   const [cartOpen, setCartOpen] = useState(false);
   const cartItems = cart || [];
  
-  const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+  // const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 
   const [favorites, setFavorites] = useState<Favorite[]>(
     (RESTAURANTS || []).map((r: any) => ({ id: r.id, isFavorite: r.isFavorite }))
@@ -53,7 +53,7 @@ export default function Food() {
     ? ['Tous', ...new Set(RESTAURANTS.map((r: any) => r.city))]
     : ['Tous'];
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  // const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   // Charger la localisation depuis localStorage
   useEffect(() => {
     const savedLocation = localStorage.getItem('userLocation');

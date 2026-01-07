@@ -2,40 +2,71 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './ride.css';
 
+// Type definitions
+interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+interface Stop {
+  id: string;
+  address: string;
+  lat: number | null;
+  lng: number | null;
+}
+
+interface LeafletMap {
+  setView: (center: [number, number], zoom: number) => void;
+  invalidateSize: () => void;
+  removeLayer: (layer: any) => void;
+  addLayer: (layer: any) => void;
+  remove: () => void;
+  on: (event: string, handler: (e: any) => void) => void;
+  off: (event: string, handler: (e: any) => void) => void;
+  getContainer: () => HTMLElement;
+  fitBounds: (bounds: [number, number][], options?: any) => void;
+}
+
+declare global {
+  interface Window {
+    L: any;
+  }
+}
+
 const RideBooking: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const mapRef = useRef(null);
-  const mapInstanceRef = useRef(null);
-  const currentLocationMarkerRef = useRef(null);
+  const mapRef = useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = useRef<LeafletMap | null>(null);
+  const currentLocationMarkerRef = useRef<any>(null);
   
   // Récupérer les données du formulaire précédent si disponibles
   const [pickup, setPickup] = useState(location.state?.pickup || '');
   const [destination, setDestination] = useState(location.state?.destination || '');
-  const [passengerType, setPassengerType] = useState('me');
+  const [passengerType] = useState('me');
   
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showPickupDropdown, setShowPickupDropdown] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(null);
   const [currentAddress, setCurrentAddress] = useState('');
-  const [stops, setStops] = useState([]); // Array of { id, address, lat, lng }
-  const [selectingLocation, setSelectingLocation] = useState(null); // 'pickup', 'destination', or stop id
+  const [stops, setStops] = useState<Stop[]>([]);
+  const [selectingLocation, setSelectingLocation] = useState<string | null>(null);
   const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
-  const [routeError, setRouteError] = useState(null);
-  const profileMenuRef = useRef(null);
-  const profileButtonRef = useRef(null);
-  const pickupInputRef = useRef(null);
-  const pickupDropdownRef = useRef(null);
-  const routeCalculationTimeoutRef = useRef(null);
+  const [routeError, setRouteError] = useState<string | null>(null);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
+  const profileButtonRef = useRef<HTMLButtonElement | null>(null);
+  const pickupInputRef = useRef<HTMLInputElement | null>(null);
+  const pickupDropdownRef = useRef<HTMLDivElement | null>(null);
+  const routeCalculationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isCalculatingRef = useRef(false);
   
   // Refs for map markers
-  const pickupMarkerRef = useRef(null);
-  const destinationMarkerRef = useRef(null);
-  const stopsMarkersRef = useRef([]);
-  const pickupCoordsRef = useRef(null);
-  const destinationCoordsRef = useRef(null);
-  const routePolylineRef = useRef(null);
+  const pickupMarkerRef = useRef<any>(null);
+  const destinationMarkerRef = useRef<any>(null);
+  const stopsMarkersRef = useRef<any[]>([]);
+  const pickupCoordsRef = useRef<Coordinates | null>(null);
+  const destinationCoordsRef = useRef<Coordinates | null>(null);
+  const routePolylineRef = useRef<any>(null);
 
   // Obtenir la position actuelle de l'utilisateur
   useEffect(() => {
@@ -43,7 +74,7 @@ const RideBooking: React.FC = () => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          setCurrentLocation({ lat: latitude, lng: longitude });
+          setCurrentLocation({ lat: latitude, lng: longitude } as Coordinates);
           
           // Géocoder les coordonnées pour obtenir l'adresse
           try {
@@ -78,13 +109,14 @@ const RideBooking: React.FC = () => {
 
   // Fermer les dropdowns quand on clique en dehors
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       // Vérifier pour le menu de profil
       if (
         profileMenuRef.current &&
         profileButtonRef.current &&
-        !profileMenuRef.current.contains(event.target) &&
-        !profileButtonRef.current.contains(event.target)
+        !profileMenuRef.current.contains(target) &&
+        !profileButtonRef.current.contains(target)
       ) {
         setShowProfileMenu(false);
       }
@@ -93,8 +125,8 @@ const RideBooking: React.FC = () => {
       if (
         pickupDropdownRef.current &&
         pickupInputRef.current &&
-        !pickupDropdownRef.current.contains(event.target) &&
-        !pickupInputRef.current.contains(event.target)
+        !pickupDropdownRef.current.contains(target) &&
+        !pickupInputRef.current.contains(target)
       ) {
         setShowPickupDropdown(false);
       }
@@ -135,7 +167,7 @@ const RideBooking: React.FC = () => {
 
           // Forcer le redimensionnement après un court délai pour s'assurer que le conteneur est visible
           setTimeout(() => {
-            if (mapInstanceRef.current) {
+            if (mapInstanceRef.current && mapInstanceRef.current.invalidateSize) {
               mapInstanceRef.current.invalidateSize();
             }
           }, 100);
@@ -178,8 +210,11 @@ const RideBooking: React.FC = () => {
   useEffect(() => {
     const handleResize = () => {
       if (mapInstanceRef.current) {
+        const map = mapInstanceRef.current;
         setTimeout(() => {
-          mapInstanceRef.current.invalidateSize();
+          if (map) {
+            map.invalidateSize();
+          }
         }, 100);
       }
     };
@@ -253,7 +288,7 @@ const RideBooking: React.FC = () => {
   }, [currentLocation, currentAddress]);
 
   // Fonction pour géocoder les coordonnées en adresse
-  const reverseGeocode = async (lat, lng) => {
+  const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
@@ -279,7 +314,7 @@ const RideBooking: React.FC = () => {
   };
 
   // Fonction pour géocoder une adresse en coordonnées
-  const geocode = async (address) => {
+  const geocode = async (address: string): Promise<Coordinates | null> => {
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
@@ -427,7 +462,7 @@ const RideBooking: React.FC = () => {
           throw new Error('Route invalide retournée par le service');
         }
 
-        const routeCoordinates = route.geometry.coordinates.map(coord => [coord[1], coord[0]]); // OSRM retourne [lng, lat], Leaflet attend [lat, lng]
+        const routeCoordinates: [number, number][] = route.geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]); // OSRM retourne [lng, lat], Leaflet attend [lat, lng]
 
         // Vérifier que la carte existe toujours avant d'ajouter la route
         if (!mapInstanceRef.current) {
@@ -455,8 +490,8 @@ const RideBooking: React.FC = () => {
         `);
 
         // Ajuster la vue pour afficher toute la route avec animation
-        if (waypoints.length > 0) {
-          const bounds = waypoints.map(wp => [wp.lat, wp.lng]);
+        if (waypoints.length > 0 && mapInstanceRef.current) {
+          const bounds: [number, number][] = waypoints.map(wp => [wp.lat, wp.lng] as [number, number]);
           mapInstanceRef.current.fitBounds(bounds, { 
             padding: [80, 80],
             maxZoom: 15
@@ -469,12 +504,13 @@ const RideBooking: React.FC = () => {
       } else {
         setRouteError('Impossible de calculer l\'itinéraire');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Erreur lors du calcul de la route:', error);
-      if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+      const err = error as { name?: string; message?: string };
+      if (err.name === 'AbortError' || err.message?.includes('aborted')) {
         setRouteError('Le calcul de l\'itinéraire a pris trop de temps');
-      } else if (error.message) {
-        setRouteError(error.message);
+      } else if (err.message) {
+        setRouteError(err.message);
       } else {
         setRouteError('Erreur lors du calcul de l\'itinéraire');
       }
@@ -488,7 +524,7 @@ const RideBooking: React.FC = () => {
   useEffect(() => {
     if (!mapInstanceRef.current || !window.L) return;
 
-    const handleMapClick = async (e) => {
+    const handleMapClick = async (e: any) => {
       if (!selectingLocation) return;
       
       const { lat, lng } = e.latlng;
@@ -496,7 +532,7 @@ const RideBooking: React.FC = () => {
 
       if (selectingLocation === 'pickup') {
         setPickup(address);
-        pickupCoordsRef.current = { lat, lng };
+        pickupCoordsRef.current = { lat, lng } as Coordinates;
         setSelectingLocation(null);
         if (mapInstanceRef.current) {
           mapInstanceRef.current.getContainer().style.cursor = '';
@@ -510,7 +546,7 @@ const RideBooking: React.FC = () => {
         }, 300);
       } else if (selectingLocation === 'destination') {
         setDestination(address);
-        destinationCoordsRef.current = { lat, lng };
+        destinationCoordsRef.current = { lat, lng } as Coordinates;
         setSelectingLocation(null);
         if (mapInstanceRef.current) {
           mapInstanceRef.current.getContainer().style.cursor = '';
@@ -525,8 +561,8 @@ const RideBooking: React.FC = () => {
       } else {
         // C'est un arrêt
         const stopId = selectingLocation;
-        setStops(prevStops => 
-          prevStops.map(stop => 
+        setStops((prevStops: Stop[]) => 
+          prevStops.map((stop: Stop) => 
             stop.id === stopId 
               ? { ...stop, address, lat, lng }
               : stop
@@ -648,8 +684,8 @@ const RideBooking: React.FC = () => {
     });
     stopsMarkersRef.current = [];
 
-    stops.forEach((stop, index) => {
-      if (stop.lat && stop.lng) {
+    stops.forEach((stop: Stop, index: number) => {
+      if (stop.lat !== null && stop.lng !== null && typeof stop.lat === 'number' && typeof stop.lng === 'number') {
         const stopIcon = window.L.divIcon({
           className: 'stop-marker',
           html: `
@@ -674,7 +710,7 @@ const RideBooking: React.FC = () => {
           iconAnchor: [14, 14]
         });
         const marker = window.L.marker(
-          [stop.lat, stop.lng],
+          [stop.lat as number, stop.lng as number],
           { icon: stopIcon }
         ).addTo(mapInstanceRef.current);
         marker.bindPopup(`<strong>Arrêt ${index + 1}</strong><br>${stop.address}`);
@@ -706,13 +742,13 @@ const RideBooking: React.FC = () => {
     };
   }, [pickup, destination, stops, drawRoute, clearRoute]);
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Logique de recherche de prix
     const route = {
       pickup,
       destination,
-      stops: stops.filter(stop => stop.address && stop.lat && stop.lng),
+      stops: stops.filter((stop: Stop) => stop.address && stop.lat !== null && stop.lng !== null),
       passengerType
     };
     console.log('Recherche de prix:', route);
@@ -793,7 +829,7 @@ const RideBooking: React.FC = () => {
                 >
                   {/* User Info */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                    <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#000' }}>{userName}</h3>
+                    <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#000' }}>User</h3>
                     <div style={{
                       width: '40px',
                       height: '40px',
@@ -1045,7 +1081,7 @@ const RideBooking: React.FC = () => {
                         onClick={() => {
                           setPickup(currentAddress);
                           if (currentLocation) {
-                            pickupCoordsRef.current = { lat: currentLocation.lat, lng: currentLocation.lng };
+                            pickupCoordsRef.current = { lat: currentLocation.lat, lng: currentLocation.lng } as Coordinates;
                           }
                           setShowPickupDropdown(false);
                         }}
@@ -1067,10 +1103,10 @@ const RideBooking: React.FC = () => {
                       className="pickup-option pickup-option-manual"
                       onClick={() => {
                         setShowPickupDropdown(false);
-                        setSelectingLocation('pickup');
-                        if (mapInstanceRef.current) {
-                          mapInstanceRef.current.getContainer().style.cursor = 'crosshair';
-                        }
+                      setSelectingLocation('pickup' as string);
+                      if (mapInstanceRef.current) {
+                        mapInstanceRef.current.getContainer().style.cursor = 'crosshair';
+                      }
                       }}
                     >
                       <div className="pickup-option-icon pickup-option-icon-manual">
@@ -1104,7 +1140,7 @@ const RideBooking: React.FC = () => {
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                   onClick={() => {
-                    setSelectingLocation('destination');
+                    setSelectingLocation('destination' as string);
                     if (mapInstanceRef.current) {
                       mapInstanceRef.current.getContainer().style.cursor = 'crosshair';
                     }
@@ -1117,7 +1153,7 @@ const RideBooking: React.FC = () => {
                   onClick={() => {
                     if (stops.length < 4) {
                       const newStopId = `stop-${Date.now()}`;
-                      setStops(prev => [...prev, { id: newStopId, address: '', lat: null, lng: null }]);
+                      setStops((prev: Stop[]) => [...prev, { id: newStopId, address: '', lat: null, lng: null }]);
                       setSelectingLocation(newStopId);
                       if (mapInstanceRef.current) {
                         mapInstanceRef.current.getContainer().style.cursor = 'crosshair';
@@ -1156,8 +1192,8 @@ const RideBooking: React.FC = () => {
                     placeholder={`Arrêt ${index + 1}`}
                     value={stop.address}
                     onChange={(e) => {
-                      setStops(prev => 
-                        prev.map(s => 
+                      setStops((prev: Stop[]) => 
+                        prev.map((s: Stop) => 
                           s.id === stop.id ? { ...s, address: e.target.value } : s
                         )
                       );
@@ -1174,10 +1210,10 @@ const RideBooking: React.FC = () => {
                     className="add-destination-btn" 
                     aria-label="Supprimer l'arrêt"
                     onClick={() => {
-                      setStops(prev => prev.filter(s => s.id !== stop.id));
+                      setStops((prev: Stop[]) => prev.filter((s: Stop) => s.id !== stop.id));
                       // Supprimer le marqueur de la carte
-                      const markerIndex = stopsMarkersRef.current.findIndex((m, i) => {
-                        const stopIndex = stops.findIndex(s => s.id === stop.id);
+                      const markerIndex = stopsMarkersRef.current.findIndex((_m: any, i: number) => {
+                        const stopIndex = stops.findIndex((s: Stop) => s.id === stop.id);
                         return i === stopIndex;
                       });
                       if (markerIndex !== -1 && stopsMarkersRef.current[markerIndex] && mapInstanceRef.current) {
