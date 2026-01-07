@@ -328,7 +328,7 @@ export default function Food() {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-4">
             <a
-              href="./main"
+              href="../../../pages/HomeRestaurant"
               className="flex items-center gap-3 px-4 py-2 text-gray-800 rounded-lg hover:shadow-lg transition-all"
             >
               <div className="logo-icon w-10 h-10 bg-gradient-to-br from-morocco-red to-morocco-green rounded-lg flex items-center justify-center shadow-md">
